@@ -1,0 +1,56 @@
+name: Check Duplicate Issue
+description: Searches for an existing open issue with the same project and module labels. Outputs the duplicate issue number if found.
+
+inputs:
+  issue-number:
+    description: The current issue number (to exclude from search).
+    required: true
+  project-key:
+    description: The project key (e.g. "eshp").
+    required: true
+  module-num:
+    description: The module number (e.g. "13").
+    required: true
+
+outputs:
+  is-duplicate:
+    description: "'true' if a duplicate issue was found."
+    value: ${{ steps.check.outputs.is_duplicate }}
+  original-number:
+    description: The issue number of the original (earliest) matching issue.
+    value: ${{ steps.check.outputs.original_number }}
+  original-url:
+    description: The URL of the original issue.
+    value: ${{ steps.check.outputs.original_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Search for duplicates
+      id: check
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const currentNumber = ${{ inputs.issue-number }};
+          const projectLabel = 'project-${{ inputs.project-key }}';
+          const moduleLabel = 'module-${{ inputs.module-num }}';
+
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: `${projectLabel},${moduleLabel}`,
+            state: 'all',
+            per_page: 100
+          });
+
+          const original = issues.data
+            .filter(i => i.number !== currentNumber)
+            .sort((a, b) => a.number - b.number)[0];
+
+          if (original) {
+            core.setOutput('is_duplicate', 'true');
+            core.setOutput('original_number', original.number);
+            core.setOutput('original_url', original.html_url);
+          } else {
+            core.setOutput('is_duplicate', 'false');
+          }

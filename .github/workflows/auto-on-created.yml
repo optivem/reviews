@@ -25,15 +25,32 @@ jobs:
           title: "INVALID | ${{ github.event.issue.title }}"
           body: "> [!CAUTION]\n> ## ❌ Issue Rejected\n> Hi @${{ github.event.issue.user.login }}, you are not a member of the selected project.\n>\n> If you believe this is an error, please contact [Valentina Jemuović](https://github.com/valentinajemuovic).\n>\n> **This issue has been closed automatically.**"
 
-      - name: Add to project board
+      - name: Check for duplicate issue
+        id: duplicate
         if: steps.validate.outputs.is-valid == 'true'
+        uses: ./.github/actions/check-duplicate
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          project-key: ${{ steps.validate.outputs.project-key }}
+          module-num: ${{ steps.validate.outputs.module-num }}
+
+      - name: Close duplicate issue
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate == 'true'
+        uses: ./.github/actions/close-issue
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          title: "DUPLICATE | ${{ github.event.issue.title }}"
+          body: "> [!CAUTION]\n> ## ❌ Duplicate Issue\n> A ticket for this project and module already exists: #${{ steps.duplicate.outputs.original-number }}\n>\n> **This issue has been closed automatically as a duplicate.**"
+
+      - name: Add to project board
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: ${{ steps.validate.outputs.project-url }}
           github-token: ${{ secrets.PROJECT_TOKEN }}
 
       - name: Set status to In Review
-        if: steps.validate.outputs.is-valid == 'true'
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: ./.github/actions/set-project-status
         with:
           issue-node-id: ${{ github.event.issue.node_id }}
@@ -41,14 +58,14 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
 
       - name: Assign team members
-        if: steps.validate.outputs.is-valid == 'true'
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: ./.github/actions/assign-issue
         with:
           issue-number: ${{ github.event.issue.number }}
           assignees: ${{ steps.validate.outputs.assignees }}
 
       - name: Update title and description
-        if: steps.validate.outputs.is-valid == 'true'
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: ./.github/actions/update-issue
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -58,14 +75,14 @@ jobs:
           module: ${{ steps.validate.outputs.module }}
 
       - name: Add module and project labels
-        if: steps.validate.outputs.is-valid == 'true'
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: ./.github/actions/add-labels
         with:
           issue-number: ${{ github.event.issue.number }}
-          labels: "module-${{ steps.validate.outputs.module-num }}, project-${{ steps.validate.outputs.project-key }}"
+          labels: "project-${{ steps.validate.outputs.project-key }}, module-${{ steps.validate.outputs.module-num }}"
 
       - name: Set issue type to Task
-        if: steps.validate.outputs.is-valid == 'true'
+        if: steps.validate.outputs.is-valid == 'true' && steps.duplicate.outputs.is-duplicate != 'true'
         uses: ./.github/actions/set-issue-type
         with:
           issue-node-id: ${{ github.event.issue.node_id }}

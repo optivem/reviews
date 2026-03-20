@@ -192,7 +192,8 @@ function generateHtml(matrix) {
           const moduleName = `${m.number} - ${m.name}`;
           const notice = `> **⚠️ This ticket is auto-generated. Please do not change the title or contents below. Just click the "Create" button below. After a few minutes, the ticket will be automatically assigned to a reviewer — no further action needed. You can add comments after the ticket is created.**`;
           const issueBody = `${notice}\n\n### Project\n\n${proj.name}\n\n### Module\n\n${moduleName}\n\n${notice}`;
-          const newIssueUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(moduleName)}&body=${encodeURIComponent(issueBody)}&labels=${encodeURIComponent('review')}`;
+          const labels = `project-${key},module-${m.number}`;
+          const newIssueUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(moduleName)}&body=${encodeURIComponent(issueBody)}&labels=${encodeURIComponent(labels)}`;
           return `<td class="cell cell-missing"><a href="${newIssueUrl}" target="_blank" rel="noopener" title="Create ticket for ${escapeHtml(moduleName)}">+</a></td>`;
         }
 
@@ -238,7 +239,8 @@ function generateHtml(matrix) {
           const moduleName = `${m.number} - ${m.name}`;
           const notice = `> **⚠️ This ticket is auto-generated. Please do not change the title or contents below. Just click the "Create" button below. After a few minutes, the ticket will be automatically assigned to a reviewer — no further action needed. You can add comments after the ticket is created.**`;
           const issueBody = `${notice}\n\n### Project\n\n${proj.name}\n\n### Module\n\n${moduleName}\n\n${notice}`;
-          const newIssueUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(moduleName)}&body=${encodeURIComponent(issueBody)}&labels=${encodeURIComponent('review')}`;
+          const labels = `project-${key},module-${m.number}`;
+          const newIssueUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(moduleName)}&body=${encodeURIComponent(issueBody)}&labels=${encodeURIComponent(labels)}`;
           return `<li><span class="card-module-name">${escapeHtml(m.number)} - ${escapeHtml(m.name)}</span><span class="card-module-status card-status-missing"><a href="${newIssueUrl}" target="_blank" rel="noopener">+</a></span></li>`;
         }
         const statusClass = "card-status-" + entry.status.toLowerCase().replace(/\s+/g, "-");
