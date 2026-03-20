@@ -1,19 +1,21 @@
 # ATDD Bootcamp
 
-[![dashboard](https://github.com/optivem/atdd-classroom/actions/workflows/dashboard.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/dashboard.yml)
-[![auto-on-created](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-created.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-created.yml)
-[![auto-on-closed](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-closed.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-closed.yml)
-[![auto-on-comment](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-comment.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-comment.yml)
-[![auto-on-reopened](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-reopened.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-reopened.yml)
-[![auto-on-edited](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-edited.yml/badge.svg)](https://github.com/optivem/atdd-classroom/actions/workflows/auto-on-edited.yml)
+**[ATDD Bootcamp Dashboard](https://optivem.github.io/atdd-bootcamp/)**
 
-ATDD Accelerator - Sandbox Project Reviews
+[![dashboard](https://github.com/optivem/atdd-bootcamp/actions/workflows/dashboard.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/dashboard.yml)
+[![auto-on-created](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-created.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-created.yml)
+[![auto-on-closed](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-closed.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-closed.yml)
+[![auto-on-comment](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-comment.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-comment.yml)
+[![auto-on-reopened](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-reopened.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-reopened.yml)
+[![auto-on-edited](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-edited.yml/badge.svg)](https://github.com/optivem/atdd-bootcamp/actions/workflows/auto-on-edited.yml)
 
-[Submit a Review Request](https://github.com/optivem/atdd-classroom/issues/new/choose)
+ATDD Bootcamp - Sandbox Project Reviews
+
+[Submit a Review Request](https://github.com/optivem/atdd-bootcamp/issues/new/choose)
 
 ## How to submit your project for review
 
-1. Click [**Submit a Review Request**](https://github.com/optivem/atdd-classroom/issues/new/choose)
+1. Click [**Submit a Review Request**](https://github.com/optivem/atdd-bootcamp/issues/new/choose)
 2. Select your project
 3. Select the module
 4. Submit the issue
@@ -71,4 +73,4 @@ When you've addressed feedback, add a comment on your issue describing what you 
 
 ## Refresh
 
-[Refresh Dashboard](https://github.com/optivem/atdd-classroom/actions/workflows/dashboard.yml)
+[Refresh Dashboard](https://github.com/optivem/atdd-bootcamp/actions/workflows/dashboard.yml)
