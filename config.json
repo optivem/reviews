@@ -47,7 +47,7 @@
       "name": "Pipeline Bootcamp",
       "modules": [
         {
-          "number": "1", "name": "Introduction", "url": "",
+          "number": "1", "name": "Introduction", "url": "", "week": 1,
           "tasks": [
             { "number": "1", "name": "Project Repository" },
             { "number": "2", "name": "Pipeline Template" },
@@ -57,38 +57,38 @@
           ]
         },
         {
-          "number": "2", "name": "Commit Stage", "url": "",
+          "number": "2", "name": "Commit Stage", "url": "", "week": 1,
           "tasks": [
             { "number": "1", "name": "Commit Stage" }
           ]
         },
         {
-          "number": "3", "name": "QA Stage", "url": "",
+          "number": "3", "name": "QA Stage", "url": "", "week": 2,
           "tasks": [
             { "number": "1", "name": "QA Stage" }
           ]
         },
         {
-          "number": "4", "name": "Production Stage", "url": "",
+          "number": "4", "name": "Production Stage", "url": "", "week": 2,
           "tasks": [
             { "number": "1", "name": "Production Stage" }
           ]
         },
         {
-          "number": "5", "name": "Acceptance Stage", "url": "",
+          "number": "5", "name": "Acceptance Stage", "url": "", "week": 2,
           "tasks": [
             { "number": "1", "name": "Acceptance Stage" }
           ]
         },
         {
-          "number": "6", "name": "Technical Customization", "url": "",
+          "number": "6", "name": "Technical Customization", "url": "", "week": 2,
           "tasks": [
             { "number": "1", "name": "Languages" },
             { "number": "2", "name": "Namespaces" }
           ]
         },
         {
-          "number": "7", "name": "Domain Customization", "url": "",
+          "number": "7", "name": "Domain Customization", "url": "", "week": 3,
           "tasks": [
             { "number": "1", "name": "System Behavior Documentation" },
             { "number": "2", "name": "Smoke Tests" },
@@ -96,7 +96,7 @@
           ]
         },
         {
-          "number": "8", "name": "Architecture Customization", "url": "",
+          "number": "8", "name": "Architecture Customization", "url": "", "week": 3,
           "tasks": [
             { "number": "1", "name": "System Architecture Documentation" },
             { "number": "2", "name": "Multi-Component Implementation" },
@@ -106,7 +106,7 @@
           ]
         },
         {
-          "number": "9", "name": "Extensions", "url": "",
+          "number": "9", "name": "Extensions", "url": "", "week": 4,
           "tasks": [
             { "number": "1", "name": "Go Further" }
           ]
@@ -119,7 +119,7 @@
       "name": "ATDD Bootcamp",
       "modules": [
         {
-          "number": "1", "name": "Introduction", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673632-sandbox-project",
+          "number": "1", "name": "Introduction", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673632-sandbox-project", "week": 1,
           "tasks": [
             { "number": "1", "name": "Repository Setup" },
             { "number": "2", "name": "API CRUD" },
@@ -131,7 +131,7 @@
           ]
         },
         {
-          "number": "2", "name": "Smoke Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673638-sandbox-project",
+          "number": "2", "name": "Smoke Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673638-sandbox-project", "week": 3,
           "tasks": [
             { "number": "1", "name": "API Smoke Tests" },
             { "number": "2", "name": "UI Smoke Tests" },
@@ -139,7 +139,7 @@
           ]
         },
         {
-          "number": "3", "name": "E2E Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673661-sandbox-project",
+          "number": "3", "name": "E2E Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673661-sandbox-project", "week": 4,
           "tasks": [
             { "number": "1", "name": "Positive API Tests" },
             { "number": "2", "name": "Negative API Tests" },
@@ -150,7 +150,7 @@
           ]
         },
         {
-          "number": "4", "name": "Architecture - Clients", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70102037-sandbox-project",
+          "number": "4", "name": "Architecture - Clients", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70102037-sandbox-project", "week": 6,
           "tasks": [
             { "number": "1", "name": "System API Client" },
             { "number": "2", "name": "System UI Client" },
@@ -160,7 +160,7 @@
           ]
         },
         {
-          "number": "5", "name": "Architecture - Drivers", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70114441-sandbox-project",
+          "number": "5", "name": "Architecture - Drivers", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70114441-sandbox-project", "week": 8,
           "tasks": [
             { "number": "1", "name": "Shop API Driver" },
             { "number": "2", "name": "Shop UI Driver" },
@@ -170,14 +170,14 @@
           ]
         },
         {
-          "number": "6", "name": "Architecture - Channels", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70114247-sandbox-project",
+          "number": "6", "name": "Architecture - Channels", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/70114247-sandbox-project", "week": 9,
           "tasks": [
             { "number": "1", "name": "System Smoke Tests" },
             { "number": "2", "name": "E2E Tests" }
           ]
         },
         {
-          "number": "7", "name": "Architecture - App DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673684-sandbox-project",
+          "number": "7", "name": "Architecture - App DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673684-sandbox-project", "week": 10,
           "tasks": [
             { "number": "1", "name": "DSL Infrastructure" },
             { "number": "2", "name": "External System DSLs" },
@@ -186,7 +186,7 @@
           ]
         },
         {
-          "number": "8", "name": "Architecture - Scenario DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673700-sandbox-project",
+          "number": "8", "name": "Architecture - Scenario DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673700-sandbox-project", "week": 12,
           "tasks": [
             { "number": "1", "name": "Smoke Tests" },
             { "number": "2", "name": "Given/When/Then Stages + Primary E2E Test" },
@@ -194,7 +194,7 @@
           ]
         },
         {
-          "number": "9", "name": "Architecture - External Stubs", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673730-sandbox-project",
+          "number": "9", "name": "Architecture - External Stubs", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673730-sandbox-project", "week": 14,
           "tasks": [
             { "number": "1", "name": "WireMock Docker Setup" },
             { "number": "2", "name": "Stub Clients and Drivers" },
@@ -202,7 +202,7 @@
           ]
         },
         {
-          "number": "10", "name": "Acceptance Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673737-sandbox-project",
+          "number": "10", "name": "Acceptance Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673737-sandbox-project", "week": 15,
           "tasks": [
             { "number": "1", "name": "Primary Acceptance Tests" },
             { "number": "2", "name": "Remaining Acceptance Tests" },
@@ -211,7 +211,7 @@
           ]
         },
         {
-          "number": "11", "name": "External System Contract Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73620977-sandbox-project",
+          "number": "11", "name": "External System Contract Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73620977-sandbox-project", "week": 17,
           "tasks": [
             { "number": "1", "name": "Real Contract Tests" },
             { "number": "2", "name": "Stub Contract Tests" },
@@ -219,14 +219,14 @@
           ]
         },
         {
-          "number": "12", "name": "ATDD - Acceptance Criteria", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73543765-sandbox-project",
+          "number": "12", "name": "ATDD - Acceptance Criteria", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73543765-sandbox-project", "week": 18,
           "tasks": [
             { "number": "1", "name": "Three Amigos Session" },
             { "number": "2", "name": "Acceptance Criteria" }
           ]
         },
         {
-          "number": "13", "name": "ATDD - Acceptance Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673750-sandbox-project",
+          "number": "13", "name": "ATDD - Acceptance Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673750-sandbox-project", "week": 19,
           "tasks": [
             { "number": "1", "name": "RED Phase" },
             { "number": "2", "name": "GREEN Phase" },
@@ -234,7 +234,7 @@
           ]
         },
         {
-          "number": "14", "name": "ATDD - External System Contract Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673764-sandbox-project",
+          "number": "14", "name": "ATDD - External System Contract Tests", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673764-sandbox-project", "week": 20,
           "tasks": [
             { "number": "1", "name": "Contract Test - RED" },
             { "number": "2", "name": "Contract Test - GREEN" },
@@ -242,7 +242,7 @@
           ]
         },
         {
-          "number": "15", "name": "Structural Changes", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673787-sandbox-project",
+          "number": "15", "name": "Structural Changes", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673787-sandbox-project", "week": 21,
           "tasks": [
             { "number": "1", "name": "UX/UI Redesign" }
           ]

@@ -244,8 +244,9 @@ function renderDesktopTable(bootcamp, scored, totalTasks) {
         ? `<a href="${escapeHtml(m.url)}" target="_blank" rel="noopener">${escapeHtml(moduleName)}</a>`
         : escapeHtml(moduleName);
 
+      const weekBadge = m.week ? `<span class="week-badge">W${m.week}</span>` : "";
       const headerRow = `          <tr class="module-group-header">
-            <td class="module-group-name" colspan="${colCount + 1}">${label}</td>
+            <td class="module-group-name" colspan="${colCount + 1}">${weekBadge}${label}</td>
           </tr>`;
 
       const taskRows = (m.tasks || [])
@@ -317,7 +318,8 @@ function renderMobileCards(bootcamp, scored, totalTasks) {
       const moduleItems = modules
         .map((m) => {
           const moduleName = `${m.number} - ${m.name}`;
-          const header = `<li class="card-module-header">${escapeHtml(moduleName)}</li>`;
+          const weekBadge = m.week ? `<span class="week-badge">W${m.week}</span>` : "";
+          const header = `<li class="card-module-header">${weekBadge}${escapeHtml(moduleName)}</li>`;
           const tasks = (m.tasks || [])
             .map((t) => {
               const taskName = `${t.number} - ${t.name}`;
