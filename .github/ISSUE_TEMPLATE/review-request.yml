@@ -31,7 +31,7 @@ body:
         - 04 - Architecture - Clients
         - 05 - Architecture - Drivers
         - 06 - Architecture - Channels
-        - 07 - Architecture - App DSL
+        - 07 - Architecture - Use Case DSL
         - 08 - Architecture - Scenario DSL
         - 09 - Architecture - External Stubs
         - 10 - Acceptance Tests

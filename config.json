@@ -177,7 +177,7 @@
           ]
         },
         {
-          "number": "7", "name": "Architecture - App DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673684-sandbox-project", "week": 10,
+          "number": "7", "name": "Architecture - Use Case DSL", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673684-sandbox-project", "week": 10,
           "tasks": [
             { "number": "1", "name": "DSL Infrastructure" },
             { "number": "2", "name": "External System DSLs" },
