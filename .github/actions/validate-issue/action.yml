@@ -25,9 +25,9 @@ outputs:
   repo-url:
     description: The project repository URL.
     value: ${{ steps.validate.outputs.repo_url }}
-  bootcamp-id:
-    description: The bootcamp id the project belongs to.
-    value: ${{ steps.validate.outputs.bootcamp_id }}
+  course-id:
+    description: The course id the project belongs to.
+    value: ${{ steps.validate.outputs.course_id }}
   module:
     description: The selected module string.
     value: ${{ steps.validate.outputs.module }}
@@ -93,21 +93,21 @@ runs:
 
           const moduleNum = selectedModule.split(' - ')[0];
 
-          // Find bootcamp: prefer explicit ### Bootcamp field, fall back to matching by project key + module
-          const bootcampMatch = body.match(/### Bootcamp\s*\n\s*(.+)/);
-          const selectedBootcamp = bootcampMatch ? bootcampMatch[1].trim() : '';
-          let bootcampId = '';
-          if (selectedBootcamp) {
-            const found = data.bootcamps.find(b => b.name === selectedBootcamp);
-            if (found) bootcampId = found.id;
+          // Find course: prefer explicit ### Course field, fall back to matching by project key + module
+          const courseMatch = body.match(/### Course\s*\n\s*(.+)/);
+          const selectedCourse = courseMatch ? courseMatch[1].trim() : '';
+          let courseId = '';
+          if (selectedCourse) {
+            const found = data.courses.find(c => c.name === selectedCourse);
+            if (found) courseId = found.id;
           }
-          if (!bootcampId) {
-            for (const bootcamp of data.bootcamps) {
-              const keys = (bootcamp.projectKeys || []).map(k => k.toUpperCase());
+          if (!courseId) {
+            for (const course of data.courses) {
+              const keys = (course.projectKeys || []).map(k => k.toUpperCase());
               if (keys.includes(team.key.toUpperCase())) {
-                const hasModule = bootcamp.modules.some(m => m.number === moduleNum);
+                const hasModule = course.modules.some(m => m.number === moduleNum);
                 if (hasModule) {
-                  bootcampId = bootcamp.id;
+                  courseId = course.id;
                   break;
                 }
               }
@@ -123,4 +123,4 @@ runs:
           core.setOutput('module_num', moduleNum);
           core.setOutput('task_num', taskNum);
           core.setOutput('assignees', team.members.join(','));
-          core.setOutput('bootcamp_id', bootcampId);
+          core.setOutput('course_id', courseId);

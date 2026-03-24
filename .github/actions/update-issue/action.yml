@@ -14,8 +14,8 @@ inputs:
   repo-url:
     description: The project repository URL.
     required: true
-  bootcamp-id:
-    description: The bootcamp id (e.g. "atdd", "pipeline").
+  course-id:
+    description: The course id (e.g. "atdd", "pipeline").
     required: true
   module:
     description: The selected module string (e.g. "02 - Smoke Tests").
@@ -40,29 +40,29 @@ runs:
           const moduleNum = selectedModule.split(' - ')[0];
           const taskNum = selectedTask ? selectedTask.split(' - ')[0] : '';
 
-          const bootcampId = '${{ inputs.bootcamp-id }}';
+          const courseId = '${{ inputs.course-id }}';
           const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-          const bootcamp = config.bootcamps.find(b => b.id === bootcampId);
-          const bootcampName = bootcamp ? bootcamp.name : bootcampId;
+          const course = config.courses.find(c => c.id === courseId);
+          const courseName = course ? course.name : courseId;
 
           const taskName = selectedTask ? selectedTask.replace(/^\d+\s*-\s*/, '') : '';
           const compositeId = selectedTask
-            ? `${projectKey}-${bootcampId.toUpperCase()}-${moduleNum}.${taskNum}`
-            : `${projectKey}-${bootcampId.toUpperCase()}-${moduleNum}`;
+            ? `${projectKey}-${courseId.toUpperCase()}-${moduleNum}.${taskNum}`
+            : `${projectKey}-${courseId.toUpperCase()}-${moduleNum}`;
           const newTitle = selectedTask
             ? `${compositeId} | ${taskName}`
             : `${compositeId} | ${selectedModule}`;
 
           let body = `## Overview\n\n`;
           body += `**Project Name:** [${projectName}](${repoUrl})\n`;
-          body += `**Bootcamp:** ${bootcampName}\n`;
+          body += `**Course:** ${courseName}\n`;
           body += `**Module:** ${selectedModule}\n`;
           if (selectedTask) {
             body += `**Task:** ${selectedTask}\n`;
           }
           const checklistPath = selectedTask
-            ? `checklists/${bootcampId}/${moduleNum}/${taskNum}.md`
-            : `checklists/${bootcampId}/${moduleNum}.md`;
+            ? `checklists/${courseId}/${moduleNum}/${taskNum}.md`
+            : `checklists/${courseId}/${moduleNum}.md`;
           if (fs.existsSync(checklistPath)) {
             const checklist = fs.readFileSync(checklistPath, 'utf8').trim();
             body += `\n## Review Checklist\n\n${checklist}`;

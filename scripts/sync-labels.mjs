@@ -12,28 +12,28 @@ const config = JSON.parse(readFileSync(join(ROOT, "config.json"), "utf-8"));
 
 // Label colors by type
 const COLORS = {
-  bootcamp: "5319e7",  // purple
+  course: "5319e7",    // purple
   project: "0075ca",   // blue
   module: "e4e669",    // yellow
   task: "c5def5",      // light blue
   closed: "d73a4a",   // red
 };
 
-// Build expected labels from config (order: project, bootcamp, module, task)
+// Build expected labels from config (order: project, course, module, task)
 const expected = new Map();
 
 for (const p of config.projects) {
   expected.set(`project-${p.key.toLowerCase()}`, COLORS.project);
 }
 
-for (const b of config.bootcamps) {
-  expected.set(`bootcamp-${b.id}`, COLORS.bootcamp);
+for (const c of config.courses) {
+  expected.set(`course-${c.id}`, COLORS.course);
 }
 
 const moduleNums = new Set();
 const taskNums = new Set();
-for (const b of config.bootcamps) {
-  for (const m of b.modules) {
+for (const c of config.courses) {
+  for (const m of c.modules) {
     moduleNums.add(m.number);
     for (const t of (m.tasks || [])) {
       taskNums.add(t.number);

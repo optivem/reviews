@@ -30,11 +30,11 @@ for (const s of config.students) nameMap[s.github.toLowerCase()] = s.name;
 const projectMap = {};
 for (const p of config.projects) projectMap[p.key.toUpperCase()] = p;
 
-for (const bootcamp of config.bootcamps) {
-  bootcamp.projects = (bootcamp.projectKeys || [])
+for (const course of config.courses) {
+  course.projects = (course.projectKeys || [])
     .map((key) => {
       const proj = projectMap[key.toUpperCase()];
-      if (!proj) console.warn(`Warning: [${bootcamp.name}] projectKey "${key}" not found — skipping`);
+      if (!proj) console.warn(`Warning: [${course.name}] projectKey "${key}" not found — skipping`);
       return proj;
     })
     .filter(Boolean);
@@ -42,24 +42,24 @@ for (const bootcamp of config.bootcamps) {
 
 function validateConfig() {
   const errors = [];
-  for (const bc of config.bootcamps) {
-    if (!bc.id) errors.push(`Bootcamp missing "id".`);
-    if (!bc.name) errors.push(`Bootcamp missing "name".`);
-    for (const key of bc.projectKeys || []) {
-      if (!projectMap[key.toUpperCase()]) errors.push(`Bootcamp "${bc.id}": projectKey "${key}" does not match any project.`);
+  for (const c of config.courses) {
+    if (!c.id) errors.push(`Course missing "id".`);
+    if (!c.name) errors.push(`Course missing "name".`);
+    for (const key of c.projectKeys || []) {
+      if (!projectMap[key.toUpperCase()]) errors.push(`Course "${c.id}": projectKey "${key}" does not match any project.`);
     }
     const moduleNums = new Set();
-    for (const m of bc.modules || []) {
-      if (m.number == null) errors.push(`Bootcamp "${bc.id}": module missing "number".`);
-      if (!m.name) errors.push(`Bootcamp "${bc.id}": module missing "name".`);
-      if (!m.tasks || m.tasks.length === 0) errors.push(`Bootcamp "${bc.id}": module ${m.number} has no tasks.`);
-      if (m.number != null && moduleNums.has(m.number)) errors.push(`Bootcamp "${bc.id}": duplicate module number ${m.number}.`);
+    for (const m of c.modules || []) {
+      if (m.number == null) errors.push(`Course "${c.id}": module missing "number".`);
+      if (!m.name) errors.push(`Course "${c.id}": module missing "name".`);
+      if (!m.tasks || m.tasks.length === 0) errors.push(`Course "${c.id}": module ${m.number} has no tasks.`);
+      if (m.number != null && moduleNums.has(m.number)) errors.push(`Course "${c.id}": duplicate module number ${m.number}.`);
       moduleNums.add(m.number);
       const taskNums = new Set();
       for (const t of m.tasks || []) {
-        if (t.number == null) errors.push(`Bootcamp "${bc.id}": module ${m.number}: task missing "number".`);
-        if (!t.name) errors.push(`Bootcamp "${bc.id}": module ${m.number}: task missing "name".`);
-        if (t.number != null && taskNums.has(t.number)) errors.push(`Bootcamp "${bc.id}": module ${m.number}: duplicate task number ${t.number}.`);
+        if (t.number == null) errors.push(`Course "${c.id}": module ${m.number}: task missing "number".`);
+        if (!t.name) errors.push(`Course "${c.id}": module ${m.number}: task missing "name".`);
+        if (t.number != null && taskNums.has(t.number)) errors.push(`Course "${c.id}": module ${m.number}: duplicate task number ${t.number}.`);
         taskNums.add(t.number);
       }
     }
@@ -131,8 +131,8 @@ function newIssueCellHtml(proj, fullName, issueBody) {
   return `<td class="cell cell-missing"><a href="${url}" target="_blank" rel="noopener" title="Create ticket for ${escapeHtml(proj.key)} - ${escapeHtml(fullName)}">+</a></td>`;
 }
 
-function newIssueBody(bootcampName, projName, moduleName, taskName) {
-  return `${ISSUE_NOTICE}\n\n### Bootcamp\n\n${bootcampName}\n\n### Project\n\n${projName}\n\n### Module\n\n${moduleName}\n\n### Task\n\n${taskName}\n\n${ISSUE_NOTICE}`;
+function newIssueBody(courseName, projName, moduleName, taskName) {
+  return `${ISSUE_NOTICE}\n\n### Course\n\n${courseName}\n\n### Project\n\n${projName}\n\n### Module\n\n${moduleName}\n\n### Task\n\n${taskName}\n\n${ISSUE_NOTICE}`;
 }
 
 // ── Scoring ──
@@ -153,11 +153,11 @@ function scoreProject(proj, modules, matrix) {
   return { proj, data, points, doneCount };
 }
 
-function computeProjectOrder(bootcamps, matrices) {
+function computeProjectOrder(courses, matrices) {
   const totals = config.projects.map((proj) => {
     let totalPoints = 0;
-    for (let i = 0; i < bootcamps.length; i++) {
-      const { points } = scoreProject(proj, bootcamps[i].modules, matrices[i]);
+    for (let i = 0; i < courses.length; i++) {
+      const { points } = scoreProject(proj, courses[i].modules, matrices[i]);
       totalPoints += points;
     }
     return { proj, totalPoints };
@@ -222,20 +222,20 @@ async function fetchAllIssues(owner, repo) {
 // ── Matrix ──
 // matrix[projectKey]["moduleNum-taskNum"] = { status, url }
 
-function buildMatrix(issues, bootcamp) {
+function buildMatrix(issues, course) {
   const matrix = {};
   for (const proj of config.projects) matrix[proj.key.toLowerCase()] = {};
 
   for (const issue of issues) {
     const labels = issue.labels.nodes.map((l) => l.name);
-    const bootcampLabel = labels.find((l) => /^bootcamp-/.test(l));
+    const courseLabel = labels.find((l) => l.startsWith("course-"));
     const moduleLabel = labels.find((l) => /^module-\d+$/.test(l));
     const taskLabel = labels.find((l) => /^task-\d+$/.test(l));
     const projectLabel = labels.find((l) => /^project-/.test(l));
 
-    if (bootcampLabel !== `bootcamp-${bootcamp.id}`) continue;
+    if (courseLabel !== `course-${course.id}`) continue;
     if (moduleLabel && !projectLabel) {
-      console.warn(`Warning: [${bootcamp.name}] Issue #${issue.number} has ${moduleLabel} but no project- label — skipping`);
+      console.warn(`Warning: [${course.name}] Issue #${issue.number} has ${moduleLabel} but no project- label — skipping`);
       continue;
     }
     if (!moduleLabel || !projectLabel || !taskLabel) continue;
@@ -245,7 +245,7 @@ function buildMatrix(issues, bootcamp) {
     const projKey = projectLabel.replace("project-", "");
 
     if (!matrix[projKey]) {
-      console.warn(`Warning: [${bootcamp.name}] Issue #${issue.number} has label ${projectLabel} but no matching project — skipping`);
+      console.warn(`Warning: [${course.name}] Issue #${issue.number} has label ${projectLabel} but no matching project — skipping`);
       continue;
     }
 
@@ -258,8 +258,8 @@ function buildMatrix(issues, bootcamp) {
 
 // ── Desktop table ──
 
-function renderDesktopTable(bootcamp, scored, totalTasks) {
-  const modules = bootcamp.modules;
+function renderDesktopTable(course, scored, totalTasks) {
+  const modules = course.modules;
   const colCount = scored.length;
 
   const headers = scored
@@ -290,14 +290,14 @@ function renderDesktopTable(bootcamp, scored, totalTasks) {
               const entry = data[taskKey(m.number, t.number)];
               if (!entry) {
                 const fullName = `${moduleName} / ${taskName}`;
-                return newIssueCellHtml(proj, fullName, newIssueBody(bootcamp.name, proj.name, moduleName, taskName));
+                return newIssueCellHtml(proj, fullName, newIssueBody(course.name, proj.name, moduleName, taskName));
               }
               return statusCellHtml(entry, proj);
             })
             .join("\n              ");
 
           return `          <tr>
-            <td class="task-name">${escapeHtml(taskName)}</td>
+            <td class="task-name">${t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(taskName)}</a>` : escapeHtml(taskName)}</td>
               ${cells}
           </tr>`;
         })
@@ -308,8 +308,8 @@ function renderDesktopTable(bootcamp, scored, totalTasks) {
     .join("\n");
 
   return `
-  <div class="bootcamp-section" id="bootcamp-${escapeHtml(bootcamp.id)}">
-    <h2 class="bootcamp-title">${escapeHtml(bootcamp.name)}</h2>
+  <div class="course-section" id="course-${escapeHtml(course.id)}">
+    <h2 class="course-title">${escapeHtml(course.name)}</h2>
     <div class="table-wrapper">
       <table>
         <thead>
@@ -336,8 +336,8 @@ ${bodyRows}
 
 // ── Mobile cards ──
 
-function renderMobileCards(bootcamp, scored, totalTasks) {
-  const modules = bootcamp.modules;
+function renderMobileCards(course, scored, totalTasks) {
+  const modules = course.modules;
 
   const cards = scored
     .map(({ proj, data, doneCount }) => {
@@ -358,11 +358,13 @@ function renderMobileCards(bootcamp, scored, totalTasks) {
               const entry = data[taskKey(m.number, t.number)];
               if (!entry) {
                 const fullName = `${moduleName} / ${taskName}`;
-                const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(fullName)}&body=${encodeURIComponent(newIssueBody(bootcamp.name, proj.name, moduleName, taskName))}`;
-                return `<li class="card-task-item"><span class="card-task-name">${escapeHtml(taskName)}</span><span class="card-module-status card-status-missing"><a href="${url}" target="_blank" rel="noopener">+</a></span></li>`;
+                const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(fullName)}&body=${encodeURIComponent(newIssueBody(course.name, proj.name, moduleName, taskName))}`;
+                const taskLabel = t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(taskName)}</a>` : escapeHtml(taskName);
+                return `<li class="card-task-item"><span class="card-task-name">${taskLabel}</span><span class="card-module-status card-status-missing"><a href="${url}" target="_blank" rel="noopener">+</a></span></li>`;
               }
               const cls = "card-status-" + entry.status.toLowerCase().replace(/\s+/g, "-");
-              return `<li class="card-task-item"><span class="card-task-name">${escapeHtml(taskName)}</span><span class="card-module-status ${cls}"><a href="${entry.url}" target="_blank" rel="noopener">${entry.status}</a></span></li>`;
+              const taskLabel = t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(taskName)}</a>` : escapeHtml(taskName);
+              return `<li class="card-task-item"><span class="card-task-name">${taskLabel}</span><span class="card-module-status ${cls}"><a href="${entry.url}" target="_blank" rel="noopener">${entry.status}</a></span></li>`;
             })
             .join("\n");
           return header + "\n" + tasks;
@@ -386,35 +388,35 @@ ${moduleItems}
     .join("\n");
 
   return `
-  <div class="bootcamp-section-mobile" id="bootcamp-${escapeHtml(bootcamp.id)}-mobile">
-    <h2 class="bootcamp-title">${escapeHtml(bootcamp.name)}</h2>
+  <div class="course-section-mobile" id="course-${escapeHtml(course.id)}-mobile">
+    <h2 class="course-title">${escapeHtml(course.name)}</h2>
 ${cards}
   </div>`;
 }
 
-// ── Bootcamp section (desktop + mobile) ──
+// ── Course section (desktop + mobile) ──
 
-function generateBootcampSection(bootcamp, matrix, sortedProjects) {
-  const modules = bootcamp.modules;
+function generateCourseSection(course, matrix, sortedProjects) {
+  const modules = course.modules;
   const totalTasks = countTasks(modules);
   const scored = sortedProjects.map((proj) => scoreProject(proj, modules, matrix));
   return {
-    section: renderDesktopTable(bootcamp, scored, totalTasks),
-    cards: renderMobileCards(bootcamp, scored, totalTasks),
+    section: renderDesktopTable(course, scored, totalTasks),
+    cards: renderMobileCards(course, scored, totalTasks),
   };
 }
 
 // ── Summary table ──
 
-function generateSummaryTable(bootcamps, matrices, sortedProjects) {
+function generateSummaryTable(courses, matrices, sortedProjects) {
   const projectTotals = sortedProjects.map((proj) => {
     let totalDone = 0;
     let totalTasks = 0;
-    for (let i = 0; i < bootcamps.length; i++) {
-      const { doneCount } = scoreProject(proj, bootcamps[i].modules, matrices[i]);
-      const bcTasks = countTasks(bootcamps[i].modules);
+    for (let i = 0; i < courses.length; i++) {
+      const { doneCount } = scoreProject(proj, courses[i].modules, matrices[i]);
+      const cTasks = countTasks(courses[i].modules);
       totalDone += doneCount;
-      totalTasks += bcTasks;
+      totalTasks += cTasks;
     }
     return { proj, totalDone, totalTasks };
   });
@@ -423,17 +425,17 @@ function generateSummaryTable(bootcamps, matrices, sortedProjects) {
     .map(({ proj, totalDone, totalTasks }) => projectHeaderHtml(proj, totalDone, totalTasks))
     .join("\n            ");
 
-  const rows = bootcamps
-    .map((bc, i) => {
-      const bcTasks = countTasks(bc.modules);
+  const rows = courses
+    .map((c, i) => {
+      const cTasks = countTasks(c.modules);
       const cells = projectTotals
         .map(({ proj }) => {
-          const { doneCount } = scoreProject(proj, bc.modules, matrices[i]);
-          return progressCellHtml(doneCount, bcTasks);
+          const { doneCount } = scoreProject(proj, c.modules, matrices[i]);
+          return progressCellHtml(doneCount, cTasks);
         })
         .join("\n              ");
       return `          <tr>
-            <td class="summary-label"><a href="#bootcamp-${escapeHtml(bc.id)}">${escapeHtml(bc.name)}</a></td>
+            <td class="summary-label"><a href="#course-${escapeHtml(c.id)}">${escapeHtml(c.name)}</a></td>
               ${cells}
           </tr>`;
     })
@@ -445,12 +447,12 @@ function generateSummaryTable(bootcamps, matrices, sortedProjects) {
 
   return `
   <div class="summary-section">
-    <h2 class="bootcamp-title">Summary</h2>
+    <h2 class="course-title">Summary</h2>
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th class="summary-label">Bootcamp</th>
+            <th class="summary-label">Course</th>
             ${headers}
           </tr>
         </thead>
@@ -469,23 +471,23 @@ ${rows}
 // ── Main ──
 
 async function main() {
-  const bootcamps = config.bootcamps;
+  const courses = config.courses;
 
   console.log("Fetching issues...");
   const issues = await fetchAllIssues(GITHUB_OWNER, GITHUB_REPO);
   console.log(`Fetched ${issues.length} issues.`);
 
-  const matrices = bootcamps.map((bc) => {
-    console.log(`Processing ${bc.name}...`);
-    return buildMatrix(issues, bc);
+  const matrices = courses.map((c) => {
+    console.log(`Processing ${c.name}...`);
+    return buildMatrix(issues, c);
   });
 
-  const sortedProjects = computeProjectOrder(bootcamps, matrices);
+  const sortedProjects = computeProjectOrder(courses, matrices);
 
   const sections = [];
   const cards = [];
-  for (let i = 0; i < bootcamps.length; i++) {
-    const result = generateBootcampSection(bootcamps[i], matrices[i], sortedProjects);
+  for (let i = 0; i < courses.length; i++) {
+    const result = generateCourseSection(courses[i], matrices[i], sortedProjects);
     sections.push(result.section);
     cards.push(result.cards);
   }
@@ -495,9 +497,9 @@ async function main() {
   const html = template
     .replace("{{DASHBOARD_CSS}}", css)
     .replace("{{LAST_UPDATED}}", new Date().toUTCString())
-    .replace("{{SUMMARY_TABLE}}", generateSummaryTable(bootcamps, matrices, sortedProjects))
-    .replace("{{BOOTCAMP_SECTIONS}}", sections.join("\n"))
-    .replace("{{BOOTCAMP_CARDS}}", cards.join("\n"))
+    .replace("{{SUMMARY_TABLE}}", generateSummaryTable(courses, matrices, sortedProjects))
+    .replace("{{COURSE_SECTIONS}}", sections.join("\n"))
+    .replace("{{COURSE_CARDS}}", cards.join("\n"))
     .replaceAll("{{CLASSROOM_TITLE}}", escapeHtml(config.title))
     .replace("{{BOARD_URL}}", escapeHtml(config.board.url))
     .replaceAll("{{GITHUB_OWNER}}", GITHUB_OWNER)

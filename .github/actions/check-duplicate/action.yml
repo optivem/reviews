@@ -8,8 +8,8 @@ inputs:
   project-key:
     description: The project key (e.g. "eshp").
     required: true
-  bootcamp-id:
-    description: The bootcamp id (e.g. "atdd", "pipeline").
+  course-id:
+    description: The course id (e.g. "atdd", "pipeline").
     required: true
   module-num:
     description: The module number (e.g. "13").
@@ -39,11 +39,11 @@ runs:
         script: |
           const currentNumber = ${{ inputs.issue-number }};
           const projectLabel = 'project-${{ inputs.project-key }}';
-          const bootcampLabel = 'bootcamp-${{ inputs.bootcamp-id }}';
+          const courseLabel = 'course-${{ inputs.course-id }}';
           const moduleLabel = 'module-${{ inputs.module-num }}';
           const taskLabel = 'task-${{ inputs.task-num }}';
 
-          const labelList = [projectLabel, bootcampLabel, moduleLabel, taskLabel].filter(l => !l.endsWith('-')).join(',');
+          const labelList = [projectLabel, courseLabel, moduleLabel, taskLabel].filter(l => !l.endsWith('-')).join(',');
 
           const issues = await github.rest.issues.listForRepo({
             owner: context.repo.owner,

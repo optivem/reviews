@@ -11,9 +11,9 @@
     .summary-label { text-align: left; font-weight: 600; background: #f9fafb; white-space: nowrap; width: 320px; min-width: 320px; max-width: 320px; }
     .summary-label a { color: #1d4ed8; text-decoration: none; }
     .summary-label a:hover { text-decoration: underline; }
-    .bootcamp-section { margin-bottom: 40px; }
-    .bootcamp-title { font-size: 1.25rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
-    .bootcamp-empty { color: #6b7280; font-size: 0.85rem; font-style: italic; padding: 16px 0; }
+    .course-section { margin-bottom: 40px; }
+    .course-title { font-size: 1.25rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+    .course-empty { color: #6b7280; font-size: 0.85rem; font-style: italic; padding: 16px 0; }
     .table-wrapper { overflow-x: auto; }
     table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
     th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: center; white-space: nowrap; }
@@ -27,6 +27,8 @@
     .week-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; color: #6b7280; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; padding: 1px 5px; margin-right: 6px; vertical-align: middle; }
     .module-group-name a:hover { text-decoration: underline; }
     .task-name { text-align: left; font-weight: 500; background: #fff; white-space: nowrap; padding-left: 24px !important; width: 320px; min-width: 320px; max-width: 320px; font-size: 0.78rem; color: #374151; }
+    .task-name a { color: #1d4ed8; text-decoration: none; }
+    .task-name a:hover { text-decoration: underline; }
     .project-header { width: 80px; min-width: 80px; max-width: 80px; }
     .project-header a { color: #1d4ed8; text-decoration: none; }
     .project-header a:hover { text-decoration: underline; }
@@ -67,7 +69,7 @@
     .teacher-links a:hover { color: #1d4ed8; text-decoration: underline; }
     /* Mobile cards */
     .cards { display: none; }
-    .bootcamp-section-mobile { margin-bottom: 32px; }
+    .course-section-mobile { margin-bottom: 32px; }
     .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
     .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
     .card-code { font-size: 0.7rem; color: #6b7280; font-weight: 600; }

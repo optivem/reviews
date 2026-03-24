@@ -41,10 +41,11 @@
     { "key": "ESLA", "name": "Event Sourcing Learning Application", "repo": "https://github.com/david-oc-miller/event-sourcing-demo", "lead": "david-oc-miller", "members": ["david-oc-miller"] },
     { "key": "PWRH", "name": "Project Powerhouse", "repo": "https://github.com/vilosia-ai/demo-customer-portal", "lead": "vilosia-ai", "members": ["vilosia-ai"] }
   ],
-  "bootcamps": [
+  "courses": [
     {
       "id": "pipeline",
-      "name": "Pipeline Bootcamp",
+      "name": "Pipeline Accelerator",
+      "courseSlug": "pipeline",
       "modules": [
         {
           "number": "1", "name": "Introduction", "url": "", "week": 1,
@@ -116,7 +117,8 @@
     },
     {
       "id": "atdd",
-      "name": "ATDD Bootcamp",
+      "name": "ATDD Accelerator",
+      "courseSlug": "atdd",
       "modules": [
         {
           "number": "1", "name": "Introduction", "url": "https://optivem.thinkific.com/courses/take/atdd/texts/73673632-sandbox-project", "week": 1,
