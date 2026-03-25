@@ -1,5 +1,5 @@
 ---
-name: config-sync-agent
+name: course-classroom-sync-agent
 description: Syncs classroom config.json with course module structure and Thinkific student view URLs
 tools: Read, Glob, Grep, Bash
 ---
