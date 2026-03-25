@@ -24,8 +24,8 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         script: |
-          const fs = require('fs');
-          const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+          const { loadConfig } = require('./scripts/load-config.cjs');
+          const config = loadConfig('.');
           const { id: projectId, statusFieldId } = config.board;
 
           const validNames = config.statuses.map(s => s.name);

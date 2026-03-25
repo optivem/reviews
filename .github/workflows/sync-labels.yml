@@ -3,7 +3,7 @@ name: sync-labels
 on:
   push:
     branches: [main]
-    paths: [config.json]
+    paths: ["config/**"]
   workflow_dispatch:
 
 jobs:

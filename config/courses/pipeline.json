@@ -1,0 +1,145 @@
+{
+  "id": "pipeline",
+  "name": "Pipeline Accelerator",
+  "courseSlug": "pipeline",
+  "modules": [
+    {
+      "number": "01",
+      "name": "Introduction",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800730-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "Setup",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100627-setup"
+        }
+      ]
+    },
+    {
+      "number": "02",
+      "name": "Commit Stage",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800764-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "Commit Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100650-commit-stage"
+        },
+        {
+          "number": "2",
+          "name": "Multi-Component: Commit Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100688-multi-component-commit-stage"
+        },
+        {
+          "number": "3",
+          "name": "Multi-Repository: Commit Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800768-multi-repository-commit-stage"
+        }
+      ]
+    },
+    {
+      "number": "03",
+      "name": "QA Stage",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800794-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "QA Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100809-qa-stage"
+        },
+        {
+          "number": "2",
+          "name": "QA Signoff",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100814-qa-signoff"
+        },
+        {
+          "number": "3",
+          "name": "Multi-Component: QA Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100844-multi-component-qa-stage"
+        },
+        {
+          "number": "4",
+          "name": "Multi-Repository: QA Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800807-multi-repository-qa-stage"
+        }
+      ]
+    },
+    {
+      "number": "04",
+      "name": "Production Stage",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800819-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "Production Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100858-production-stage"
+        },
+        {
+          "number": "2",
+          "name": "Multi-Component: Production Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100877-multi-component-production-stage"
+        },
+        {
+          "number": "3",
+          "name": "Multi-Repository: Production Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800825-multi-repository-production-stage"
+        }
+      ]
+    },
+    {
+      "number": "05",
+      "name": "Acceptance Stage",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800834-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "Acceptance Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100917-acceptance-stage"
+        },
+        {
+          "number": "2",
+          "name": "Multi-Component: Acceptance Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100936-multi-component-acceptance-stage"
+        },
+        {
+          "number": "3",
+          "name": "Multi-Repository: Acceptance Stage",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800840-multi-repository-acceptance-stage"
+        },
+        {
+          "number": "4",
+          "name": "Stage Run Conditions",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100930-stage-run-conditions"
+        }
+      ]
+    },
+    {
+      "number": "06",
+      "name": "Extensions (Optional)",
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800859-overview",
+      "tasks": [
+        {
+          "number": "1",
+          "name": "Additional Technical Characteristics",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70101018-additional-technical-characteristics"
+        },
+        {
+          "number": "2",
+          "name": "Go Further",
+          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800864-go-further"
+        }
+      ]
+    }
+  ],
+  "projectKeys": [
+    "ESHP",
+    "CCRS",
+    "BDOK",
+    "CTF",
+    "GHBL",
+    "VGFN",
+    "FRS",
+    "ESLA",
+    "PWRH"
+  ]
+}

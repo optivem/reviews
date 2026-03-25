@@ -32,6 +32,7 @@ runs:
       with:
         script: |
           const fs = require('fs');
+          const { loadConfig } = require('./scripts/load-config.cjs');
           const projectKey = '${{ inputs.project-key }}';
           const projectName = '${{ inputs.project-name }}';
           const repoUrl = '${{ inputs.repo-url }}';
@@ -41,7 +42,7 @@ runs:
           const taskNum = selectedTask ? selectedTask.split(' - ')[0] : '';
 
           const courseId = '${{ inputs.course-id }}';
-          const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+          const config = loadConfig('.');
           const course = config.courses.find(c => c.id === courseId);
           const courseName = course ? course.name : courseId;
 

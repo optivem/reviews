@@ -19,8 +19,8 @@ runs:
       uses: actions/github-script@v8
       with:
         script: |
-          const fs = require('fs');
-          const data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+          const { loadConfig } = require('./scripts/load-config.cjs');
+          const data = loadConfig('.');
           const username = '${{ inputs.username }}'.toLowerCase();
           const isBot = username.endsWith('[bot]');
           const isReviewer = isBot || data.reviewers.some(r => r.github.toLowerCase() === username);

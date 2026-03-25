@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { execSync } from "child_process";
+import { loadConfig } from "./load-config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
-const config = JSON.parse(readFileSync(join(ROOT, "config.json"), "utf-8"));
+const config = loadConfig(ROOT);
 
 // Label colors by type
 const COLORS = {
@@ -30,21 +30,15 @@ for (const c of config.courses) {
   expected.set(`course-${c.id}`, COLORS.course);
 }
 
-const moduleNums = new Set();
-const taskNums = new Set();
 for (const c of config.courses) {
   for (const m of c.modules) {
-    moduleNums.add(m.number);
+    const moduleKey = m.slug || m.number;
+    expected.set(`module-${moduleKey}`, COLORS.module);
     for (const t of (m.tasks || [])) {
-      taskNums.add(t.number);
+      const taskKey = t.slug || t.number;
+      expected.set(`task-${taskKey}`, COLORS.task);
     }
   }
-}
-for (const num of moduleNums) {
-  expected.set(`module-${num}`, COLORS.module);
-}
-for (const num of taskNums) {
-  expected.set(`task-${num}`, COLORS.task);
 }
 
 // Auto-close reason labels

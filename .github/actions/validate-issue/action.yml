@@ -34,12 +34,18 @@ outputs:
   module-num:
     description: The module number (e.g. "02").
     value: ${{ steps.validate.outputs.module_num }}
+  module-slug:
+    description: The module slug from the course folder name (e.g. "01-introduction").
+    value: ${{ steps.validate.outputs.module_slug }}
   task:
     description: The selected task string.
     value: ${{ steps.validate.outputs.task }}
   task-num:
     description: The task number (e.g. "03").
     value: ${{ steps.validate.outputs.task_num }}
+  task-slug:
+    description: The task slug from the lesson file name (e.g. "01-setup").
+    value: ${{ steps.validate.outputs.task_slug }}
   assignees:
     description: Comma-separated list of team member GitHub usernames.
     value: ${{ steps.validate.outputs.assignees }}
@@ -55,8 +61,8 @@ runs:
         INPUT_BODY: ${{ inputs.body }}
       with:
         script: |
-          const fs = require('fs');
-          const data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+          const { loadConfig } = require('./scripts/load-config.cjs');
+          const data = loadConfig('.');
           const creator = process.env.INPUT_USERNAME;
           const body = process.env.INPUT_BODY || '';
 
@@ -124,3 +130,22 @@ runs:
           core.setOutput('task_num', taskNum);
           core.setOutput('assignees', team.members.join(','));
           core.setOutput('course_id', courseId);
+
+          // Look up slugs from config
+          let moduleSlug = '';
+          let taskSlug = '';
+          if (courseId) {
+            const course = data.courses.find(c => c.id === courseId);
+            if (course) {
+              const mod = course.modules.find(m => m.number === moduleNum);
+              if (mod) {
+                moduleSlug = mod.slug || '';
+                if (taskNum) {
+                  const task = mod.tasks.find(t => t.number === taskNum);
+                  if (task) taskSlug = task.slug || '';
+                }
+              }
+            }
+          }
+          core.setOutput('module_slug', moduleSlug);
+          core.setOutput('task_slug', taskSlug);

@@ -1,12 +1,12 @@
 ---
 name: course-classroom-sync-agent
-description: Syncs classroom config.json with course module structure and Thinkific student view URLs
+description: Syncs classroom config/courses/ files with course module structure and Thinkific student view URLs
 tools: Read, Glob, Grep, Bash
 ---
 
 You are the Config Sync Agent for the classroom repo.
 
-Your job is to update `config.json` by scanning course module structures and scraping Thinkific student view URLs using the existing `sync-classroom-urls.ts` tool.
+Your job is to update course config files in `config/courses/` by scanning course module structures and scraping Thinkific student view URLs using the existing `sync-classroom-urls.ts` tool.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ cd "../courses/tools" && npx tsx sync-classroom-urls.ts "../classroom"
 The script will:
 1. Scan accelerator lesson files to derive modules and tasks
 2. Launch a browser and scrape Thinkific student view for URLs
-3. Update `config.json` with the new module structure and URLs
+3. Update `config/courses/<course-id>.json` with the new module structure and URLs
 
 If the user specifies a single course (e.g. "sync pipeline config"), pass only that course's path:
 
@@ -39,17 +39,17 @@ cd "../courses/tools" && npx tsx sync-classroom-urls.ts "../classroom" "../cours
 
 After the sync completes:
 
-1. Read `config.json` and check for any tasks with missing URLs (no `url` field or empty string).
+1. Read the course config files in `config/courses/` and check for any tasks with missing URLs (no `url` field or empty string).
 2. Report a summary:
    - How many modules and tasks were synced per course
    - Any unmatched tasks (tasks without URLs)
 
 ### Step 3: Commit and push
 
-If the sync was successful and changed `config.json`:
+If the sync was successful and changed course config files:
 
 ```bash
-git add config.json && git commit -m "chore: sync config.json with course structure" && git push
+git add config/courses/ && git commit -m "chore: sync course config with course structure" && git push
 ```
 
 ## Rules

@@ -34,8 +34,8 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         script: |
-          const fs = require('fs');
-          const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+          const { loadConfig } = require('./scripts/load-config.cjs');
+          const config = loadConfig('.');
           const projectKey = '${{ inputs.project-key }}'.toLowerCase();
           const courseId = '${{ inputs.course-id }}';
           const moduleNum = '${{ inputs.module-num }}';
@@ -68,7 +68,7 @@ runs:
           // Find all issues for the previous module + this project
           const projectLabel = `project-${projectKey}`;
           const courseLabel = `course-${courseId}`;
-          const moduleLabel = `module-${prevModule.number}`;
+          const moduleLabel = `module-${prevModule.slug || prevModule.number}`;
 
           const issues = await github.rest.issues.listForRepo({
             owner: context.repo.owner,
@@ -78,20 +78,20 @@ runs:
             per_page: 100
           });
 
-          // Build a map of task number → issue node ID
+          // Build a map of task slug → issue node ID
           const taskIssueMap = {};
           for (const issue of issues.data) {
-            const taskLabel = issue.labels.find(l => /^task-\d+$/.test(l.name));
+            const taskLabel = issue.labels.find(l => /^task-.+/.test(l.name));
             if (taskLabel) {
-              const taskNum = taskLabel.name.replace('task-', '');
-              taskIssueMap[taskNum] = issue.node_id;
+              const taskSlug = taskLabel.name.replace('task-', '');
+              taskIssueMap[taskSlug] = issue.node_id;
             }
           }
 
           // Check each task in the previous module
           const incompleteTasks = [];
           for (const task of prevTasks) {
-            const nodeId = taskIssueMap[task.number];
+            const nodeId = taskIssueMap[task.slug || task.number];
             if (!nodeId) {
               incompleteTasks.push(`${prevModule.number}.${task.number} - ${task.name}`);
               continue;

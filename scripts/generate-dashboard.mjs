@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { loadConfig } from "./load-config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -20,7 +21,7 @@ if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
 
 // ── Config ──
 
-const config = JSON.parse(readFileSync(join(ROOT, "config.json"), "utf-8"));
+const config = loadConfig(ROOT);
 const boardId = config.board.id;
 
 const nameMap = {};
