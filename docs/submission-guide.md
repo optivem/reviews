@@ -8,7 +8,7 @@
 4. Submit the issue
 5. When you're ready for review, add a comment on the issue with:
    - A link to your repository
-   - For each milestone in the module's Sandbox Project page, confirm how you satisfied each item in the Review Checklist
+   - For each item in the Review Checklist, confirm how you satisfied it
 
 ## Review Process
 

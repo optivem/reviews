@@ -15,11 +15,10 @@ const COLORS = {
   course: "5319e7",    // purple
   project: "0075ca",   // blue
   module: "e4e669",    // yellow
-  milestone: "c5def5",      // light blue
   closed: "d73a4a",   // red
 };
 
-// Build expected labels from config (order: project, course, module, milestone)
+// Build expected labels from config (order: project, course, module)
 const expected = new Map();
 
 for (const p of config.projects) {
@@ -34,10 +33,6 @@ for (const c of config.courses) {
   for (const m of c.modules) {
     const moduleKey = m.label || m.number;
     expected.set(`module-${moduleKey}`, COLORS.module);
-    for (const t of (m.milestones || [])) {
-      const milestoneKey = t.label || t.number;
-      expected.set(`milestone-${milestoneKey}`, COLORS.milestone);
-    }
   }
 }
 

@@ -53,16 +53,8 @@ function validateConfig() {
     for (const m of c.modules || []) {
       if (m.number == null) errors.push(`Course "${c.id}": module missing "number".`);
       if (!m.name) errors.push(`Course "${c.id}": module missing "name".`);
-      if (!m.milestones || m.milestones.length === 0) errors.push(`Course "${c.id}": module ${m.number} has no milestones.`);
       if (m.number != null && moduleNums.has(m.number)) errors.push(`Course "${c.id}": duplicate module number ${m.number}.`);
       moduleNums.add(m.number);
-      const milestoneNums = new Set();
-      for (const t of m.milestones || []) {
-        if (t.number == null) errors.push(`Course "${c.id}": module ${m.number}: milestone missing "number".`);
-        if (!t.name) errors.push(`Course "${c.id}": module ${m.number}: milestone missing "name".`);
-        if (t.number != null && milestoneNums.has(t.number)) errors.push(`Course "${c.id}": module ${m.number}: duplicate milestone number ${t.number}.`);
-        milestoneNums.add(t.number);
-      }
     }
   }
   if (errors.length > 0) {
@@ -94,12 +86,8 @@ function pct(done, total) {
   return total > 0 ? Math.round((done / total) * 100) : 0;
 }
 
-function countMilestones(modules) {
-  return modules.reduce((sum, m) => sum + (m.milestones || []).length, 0);
-}
-
-function milestoneKey(moduleNum, milestoneNum) {
-  return `${moduleNum}-${milestoneNum}`;
+function countModules(modules) {
+  return modules.length;
 }
 
 const ISSUE_NOTICE = `> **\u26a0\ufe0f This ticket is auto-generated. Please do not change the title or contents below. Just click the "Create" button below. After a few minutes, the ticket will be automatically assigned to a reviewer \u2014 no further action needed. You can add comments after the ticket is created.**`;
@@ -111,7 +99,7 @@ function projectHeaderHtml(proj, done, total) {
   const nameHtml = proj.repo
     ? `<a href="${escapeHtml(proj.repo)}" target="_blank" rel="noopener" title="${escapeHtml(proj.name)}">${escapeHtml(proj.key)}</a>`
     : `<span title="${escapeHtml(proj.name)}">${escapeHtml(proj.key)}</span>`;
-  return `<th class="project-header" title="${escapeHtml(proj.name)} \u2014 ${done} / ${total} milestones completed (${p}%)">${nameHtml}<div class="project-full-name">${escapeHtml(proj.name)}</div><div class="project-lead">${escapeHtml(displayName(proj.lead))}</div></th>`;
+  return `<th class="project-header" title="${escapeHtml(proj.name)} \u2014 ${done} / ${total} modules completed (${p}%)">${nameHtml}<div class="project-full-name">${escapeHtml(proj.name)}</div><div class="project-lead">${escapeHtml(displayName(proj.lead))}</div></th>`;
 }
 
 function progressCellHtml(done, total) {
@@ -132,8 +120,8 @@ function newIssueCellHtml(proj, fullName, issueBody) {
   return `<td class="cell cell-missing"><a href="${url}" target="_blank" rel="noopener" title="Create ticket for ${escapeHtml(proj.key)} - ${escapeHtml(fullName)}">+</a></td>`;
 }
 
-function newIssueBody(courseName, projName, moduleName, milestoneName) {
-  return `${ISSUE_NOTICE}\n\n### Course\n\n${courseName}\n\n### Project\n\n${projName}\n\n### Module\n\n${moduleName}\n\n### Milestone\n\n${milestoneName}\n\n${ISSUE_NOTICE}`;
+function newIssueBody(courseName, projName, moduleName) {
+  return `${ISSUE_NOTICE}\n\n### Course\n\n${courseName}\n\n### Project\n\n${projName}\n\n### Module\n\n${moduleName}\n\n${ISSUE_NOTICE}`;
 }
 
 // ── Scoring ──
@@ -143,12 +131,10 @@ function scoreProject(proj, modules, matrix) {
   let points = 0;
   let doneCount = 0;
   for (const m of modules) {
-    for (const t of m.milestones || []) {
-      const entry = data[milestoneKey(m.number, t.number)];
-      if (entry) {
-        points += statusPoints(entry.status);
-        if (entry.status === "Done") doneCount++;
-      }
+    const entry = data[m.number];
+    if (entry) {
+      points += statusPoints(entry.status);
+      if (entry.status === "Done") doneCount++;
     }
   }
   return { proj, data, points, doneCount };
@@ -221,7 +207,7 @@ async function fetchAllIssues(owner, repo) {
 }
 
 // ── Matrix ──
-// matrix[projectKey]["moduleNum-milestoneNum"] = { status, url }
+// matrix[projectKey][moduleNum] = { status, url }
 
 function buildMatrix(issues, course) {
   const matrix = {};
@@ -231,7 +217,6 @@ function buildMatrix(issues, course) {
     const labels = issue.labels.nodes.map((l) => l.name);
     const courseLabel = labels.find((l) => l.startsWith("course-"));
     const moduleLabel = labels.find((l) => /^module-\d+/.test(l));
-    const milestoneLabel = labels.find((l) => /^milestone-\d+/.test(l));
     const projectLabel = labels.find((l) => /^project-/.test(l));
 
     if (courseLabel !== `course-${course.id}`) continue;
@@ -239,10 +224,9 @@ function buildMatrix(issues, course) {
       console.warn(`Warning: [${course.name}] Issue #${issue.number} has ${moduleLabel} but no project- label — skipping`);
       continue;
     }
-    if (!moduleLabel || !projectLabel || !milestoneLabel) continue;
+    if (!moduleLabel || !projectLabel) continue;
 
     const moduleNum = moduleLabel.match(/^module-(\d+)/)[1];
-    const milestoneNum = milestoneLabel.match(/^milestone-(\d+)/)[1];
     const projKey = projectLabel.replace("project-", "");
 
     if (!matrix[projKey]) {
@@ -252,23 +236,22 @@ function buildMatrix(issues, course) {
 
     const projectItem = issue.projectItems.nodes.find((n) => n.project.id === boardId);
     const status = projectItem?.fieldValueByName?.name || "In Review";
-    matrix[projKey][milestoneKey(moduleNum, milestoneNum)] = { status, url: issue.url };
+    matrix[projKey][moduleNum] = { status, url: issue.url };
   }
   return matrix;
 }
 
 // ── Desktop table ──
 
-function renderDesktopTable(course, scored, totalMilestones) {
+function renderDesktopTable(course, scored, totalModules) {
   const modules = course.modules;
-  const colCount = scored.length;
 
   const headers = scored
-    .map(({ proj, doneCount }) => projectHeaderHtml(proj, doneCount, totalMilestones))
+    .map(({ proj, doneCount }) => projectHeaderHtml(proj, doneCount, totalModules))
     .join("\n            ");
 
   const progressRow = scored
-    .map(({ doneCount }) => progressCellHtml(doneCount, totalMilestones))
+    .map(({ doneCount }) => progressCellHtml(doneCount, totalModules))
     .join("\n              ");
 
   const bodyRows = modules
@@ -279,32 +262,21 @@ function renderDesktopTable(course, scored, totalMilestones) {
         : escapeHtml(moduleName);
 
       const weekBadge = m.week ? `<span class="week-badge">W${m.week}</span>` : "";
-      const headerRow = `          <tr class="module-group-header">
-            <td class="module-group-name" colspan="${colCount + 1}">${weekBadge}${label}</td>
-          </tr>`;
 
-      const milestoneRows = (m.milestones || [])
-        .map((t) => {
-          const milestoneName = `${t.number} - ${t.name}`;
-          const cells = scored
-            .map(({ proj, data }) => {
-              const entry = data[milestoneKey(m.number, t.number)];
-              if (!entry) {
-                const fullName = `${moduleName} / ${milestoneName}`;
-                return newIssueCellHtml(proj, fullName, newIssueBody(course.name, proj.name, moduleName, milestoneName));
-              }
-              return statusCellHtml(entry, proj);
-            })
-            .join("\n              ");
+      const cells = scored
+        .map(({ proj, data }) => {
+          const entry = data[m.number];
+          if (!entry) {
+            return newIssueCellHtml(proj, moduleName, newIssueBody(course.name, proj.name, moduleName));
+          }
+          return statusCellHtml(entry, proj);
+        })
+        .join("\n              ");
 
-          return `          <tr>
-            <td class="milestone-name">${t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(milestoneName)}</a>` : escapeHtml(milestoneName)}</td>
+      return `          <tr>
+            <td class="module-name">${weekBadge}${label}</td>
               ${cells}
           </tr>`;
-        })
-        .join("\n");
-
-      return headerRow + "\n" + milestoneRows;
     })
     .join("\n");
 
@@ -315,7 +287,7 @@ function renderDesktopTable(course, scored, totalMilestones) {
       <table>
         <thead>
           <tr>
-            <th class="module-name">Module / Milestone</th>
+            <th class="module-name">Module</th>
             ${headers}
           </tr>
           <tr class="progress-row">
@@ -337,12 +309,12 @@ ${bodyRows}
 
 // ── Mobile cards ──
 
-function renderMobileCards(course, scored, totalMilestones) {
+function renderMobileCards(course, scored, totalModules) {
   const modules = course.modules;
 
   const cards = scored
     .map(({ proj, data, doneCount }) => {
-      const p = pct(doneCount, totalMilestones);
+      const p = pct(doneCount, totalModules);
 
       const nameHtml = proj.repo
         ? `<a href="${escapeHtml(proj.repo)}" target="_blank" rel="noopener">${escapeHtml(proj.name)}</a>`
@@ -352,23 +324,15 @@ function renderMobileCards(course, scored, totalMilestones) {
         .map((m) => {
           const moduleName = `${m.number} - ${m.name}`;
           const weekBadge = m.week ? `<span class="week-badge">W${m.week}</span>` : "";
-          const header = `<li class="card-module-header">${weekBadge}${escapeHtml(moduleName)}</li>`;
-          const milestones = (m.milestones || [])
-            .map((t) => {
-              const milestoneName = `${t.number} - ${t.name}`;
-              const entry = data[milestoneKey(m.number, t.number)];
-              if (!entry) {
-                const fullName = `${moduleName} / ${milestoneName}`;
-                const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(fullName)}&body=${encodeURIComponent(newIssueBody(course.name, proj.name, moduleName, milestoneName))}`;
-                const milestoneLabel = t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(milestoneName)}</a>` : escapeHtml(milestoneName);
-                return `<li class="card-milestone-item"><span class="card-milestone-name">${milestoneLabel}</span><span class="card-module-status card-status-missing"><a href="${url}" target="_blank" rel="noopener">+</a></span></li>`;
-              }
-              const cls = "card-status-" + entry.status.toLowerCase().replace(/\s+/g, "-");
-              const milestoneLabel = t.url ? `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(milestoneName)}</a>` : escapeHtml(milestoneName);
-              return `<li class="card-milestone-item"><span class="card-milestone-name">${milestoneLabel}</span><span class="card-module-status ${cls}"><a href="${entry.url}" target="_blank" rel="noopener">${entry.status}</a></span></li>`;
-            })
-            .join("\n");
-          return header + "\n" + milestones;
+          const entry = data[m.number];
+          if (!entry) {
+            const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodeURIComponent(moduleName)}&body=${encodeURIComponent(newIssueBody(course.name, proj.name, moduleName))}`;
+            const moduleLabel = m.url ? `<a href="${escapeHtml(m.url)}" target="_blank" rel="noopener">${escapeHtml(moduleName)}</a>` : escapeHtml(moduleName);
+            return `<li class="card-module-item">${weekBadge}<span class="card-module-name">${moduleLabel}</span><span class="card-module-status card-status-missing"><a href="${url}" target="_blank" rel="noopener">+</a></span></li>`;
+          }
+          const cls = "card-status-" + entry.status.toLowerCase().replace(/\s+/g, "-");
+          const moduleLabel = m.url ? `<a href="${escapeHtml(m.url)}" target="_blank" rel="noopener">${escapeHtml(moduleName)}</a>` : escapeHtml(moduleName);
+          return `<li class="card-module-item">${weekBadge}<span class="card-module-name">${moduleLabel}</span><span class="card-module-status ${cls}"><a href="${entry.url}" target="_blank" rel="noopener">${entry.status}</a></span></li>`;
         })
         .join("\n");
 
@@ -380,7 +344,7 @@ function renderMobileCards(course, scored, totalMilestones) {
         <span class="card-code">${escapeHtml(proj.key)}</span>
       </div>
       <div class="card-lead">Lead: <a href="https://github.com/${encodeURIComponent(proj.lead)}" target="_blank" rel="noopener">${escapeHtml(displayName(proj.lead))}</a></div>
-      ${doneCount > 0 ? `<div class="card-progress-label">${doneCount} / ${totalMilestones} (${p}%)</div>` : ""}
+      ${doneCount > 0 ? `<div class="card-progress-label">${doneCount} / ${totalModules} (${p}%)</div>` : ""}
       <ul class="card-modules">
 ${moduleItems}
       </ul>
@@ -399,11 +363,11 @@ ${cards}
 
 function generateCourseSection(course, matrix, sortedProjects) {
   const modules = course.modules;
-  const totalMilestones = countMilestones(modules);
+  const totalModules = countModules(modules);
   const scored = sortedProjects.map((proj) => scoreProject(proj, modules, matrix));
   return {
-    section: renderDesktopTable(course, scored, totalMilestones),
-    cards: renderMobileCards(course, scored, totalMilestones),
+    section: renderDesktopTable(course, scored, totalModules),
+    cards: renderMobileCards(course, scored, totalModules),
   };
 }
 
@@ -412,27 +376,26 @@ function generateCourseSection(course, matrix, sortedProjects) {
 function generateSummaryTable(courses, matrices, sortedProjects) {
   const projectTotals = sortedProjects.map((proj) => {
     let totalDone = 0;
-    let totalMilestones = 0;
+    let totalModules = 0;
     for (let i = 0; i < courses.length; i++) {
       const { doneCount } = scoreProject(proj, courses[i].modules, matrices[i]);
-      const cMilestones = countMilestones(courses[i].modules);
       totalDone += doneCount;
-      totalMilestones += cMilestones;
+      totalModules += countModules(courses[i].modules);
     }
-    return { proj, totalDone, totalMilestones };
+    return { proj, totalDone, totalModules };
   });
 
   const headers = projectTotals
-    .map(({ proj, totalDone, totalMilestones }) => projectHeaderHtml(proj, totalDone, totalMilestones))
+    .map(({ proj, totalDone, totalModules }) => projectHeaderHtml(proj, totalDone, totalModules))
     .join("\n            ");
 
   const rows = courses
     .map((c, i) => {
-      const cMilestones = countMilestones(c.modules);
+      const cModules = countModules(c.modules);
       const cells = projectTotals
         .map(({ proj }) => {
           const { doneCount } = scoreProject(proj, c.modules, matrices[i]);
-          return progressCellHtml(doneCount, cMilestones);
+          return progressCellHtml(doneCount, cModules);
         })
         .join("\n              ");
       return `          <tr>
@@ -443,7 +406,7 @@ function generateSummaryTable(courses, matrices, sortedProjects) {
     .join("\n");
 
   const totalCells = projectTotals
-    .map(({ totalDone, totalMilestones }) => progressCellHtml(totalDone, totalMilestones))
+    .map(({ totalDone, totalModules }) => progressCellHtml(totalDone, totalModules))
     .join("\n              ");
 
   return `

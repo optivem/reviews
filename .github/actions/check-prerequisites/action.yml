@@ -1,5 +1,5 @@
 name: Check Module Prerequisites
-description: Verifies that all milestones in the previous module are "Done" before allowing a new ticket.
+description: Verifies that the previous module is "Done" before allowing a new ticket.
 
 inputs:
   project-key:
@@ -19,9 +19,9 @@ outputs:
   allowed:
     description: "'true' if the previous module is complete or this is module 1."
     value: ${{ steps.check.outputs.allowed }}
-  missing-milestones:
-    description: "Comma-separated list of incomplete milestones from the previous module."
-    value: ${{ steps.check.outputs.missing_milestones }}
+  incomplete-module:
+    description: "The previous module name if it is not yet complete."
+    value: ${{ steps.check.outputs.incomplete_module }}
 
 runs:
   using: composite
@@ -44,7 +44,7 @@ runs:
           const course = config.courses.find(c => c.id === courseId);
           if (!course) {
             core.setOutput('allowed', 'true');
-            core.setOutput('missing_milestones', '');
+            core.setOutput('incomplete_module', '');
             return;
           }
 
@@ -53,19 +53,13 @@ runs:
           if (moduleIndex <= 0) {
             // First module or not found — no prerequisites
             core.setOutput('allowed', 'true');
-            core.setOutput('missing_milestones', '');
+            core.setOutput('incomplete_module', '');
             return;
           }
 
           const prevModule = course.modules[moduleIndex - 1];
-          const prevMilestones = prevModule.milestones || [];
-          if (prevMilestones.length === 0) {
-            core.setOutput('allowed', 'true');
-            core.setOutput('missing_milestones', '');
-            return;
-          }
 
-          // Find all issues for the previous module + this project
+          // Find the issue for the previous module + this project
           const projectLabel = `project-${projectKey}`;
           const courseLabel = `course-${courseId}`;
           const moduleLabel = `module-${prevModule.label || prevModule.number}`;
@@ -78,56 +72,41 @@ runs:
             per_page: 100
           });
 
-          // Build a map of milestone label → issue node ID
-          const milestoneIssueMap = {};
-          for (const issue of issues.data) {
-            const milestoneLabel = issue.labels.find(l => /^milestone-.+/.test(l.name));
-            if (milestoneLabel) {
-              const milestoneKey = milestoneLabel.name.replace('milestone-', '');
-              milestoneIssueMap[milestoneKey] = issue.node_id;
-            }
+          const prevModuleName = `${prevModule.number} - ${prevModule.name}`;
+
+          if (issues.data.length === 0) {
+            core.setOutput('allowed', 'false');
+            core.setOutput('incomplete_module', prevModuleName);
+            return;
           }
 
-          // Check each milestone in the previous module
-          const incompleteMilestones = [];
-          for (const milestone of prevMilestones) {
-            const nodeId = milestoneIssueMap[milestone.label || milestone.number];
-            if (!nodeId) {
-              incompleteMilestones.push(`${prevModule.number}.${milestone.number} - ${milestone.name}`);
-              continue;
-            }
-
-            // Query project board status
-            const result = await github.graphql(`
-              query($issueId: ID!) {
-                node(id: $issueId) {
-                  ... on Issue {
-                    projectItems(first: 10) {
-                      nodes {
-                        project { id }
-                        fieldValueByName(name: "Status") {
-                          ... on ProjectV2ItemFieldSingleSelectValue {
-                            name
-                          }
+          // Check the status of the first matching issue on the project board
+          const issue = issues.data[0];
+          const result = await github.graphql(`
+            query($issueId: ID!) {
+              node(id: $issueId) {
+                ... on Issue {
+                  projectItems(first: 10) {
+                    nodes {
+                      project { id }
+                      fieldValueByName(name: "Status") {
+                        ... on ProjectV2ItemFieldSingleSelectValue {
+                          name
                         }
                       }
                     }
                   }
                 }
               }
-            `, { issueId: nodeId });
-
-            const item = result.node.projectItems.nodes.find(n => n.project.id === projectId);
-            const status = item?.fieldValueByName?.name || '';
-            if (status !== 'Done') {
-              incompleteMilestones.push(`${prevModule.number}.${milestone.number} - ${milestone.name}`);
             }
-          }
+          `, { issueId: issue.node_id });
 
-          if (incompleteMilestones.length === 0) {
+          const item = result.node.projectItems.nodes.find(n => n.project.id === projectId);
+          const status = item?.fieldValueByName?.name || '';
+          if (status === 'Done') {
             core.setOutput('allowed', 'true');
-            core.setOutput('missing_milestones', '');
+            core.setOutput('incomplete_module', '');
           } else {
             core.setOutput('allowed', 'false');
-            core.setOutput('missing_milestones', incompleteMilestones.join(', '));
+            core.setOutput('incomplete_module', prevModuleName);
           }

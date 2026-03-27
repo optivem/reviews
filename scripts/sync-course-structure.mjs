@@ -129,5 +129,5 @@ for (const { id: courseId, configFile, coursePath } of COURSES) {
   writeFileSync(configPath, JSON.stringify(course, null, 2) + "\n");
 
   const milestoneCount = course.modules.reduce((sum, m) => sum + m.milestones.length, 0);
-  console.log(`${courseId}: ${course.modules.length} modules, ${milestoneCount} milestones`);
+  console.log(`${courseId}: ${course.modules.length} modules, ${milestoneCount} milestones (checklist items)`);
 }

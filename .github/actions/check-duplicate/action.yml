@@ -14,9 +14,6 @@ inputs:
   module-label:
     description: The module label from the course folder name (e.g. "01-introduction").
     required: true
-  milestone-label:
-    description: The milestone label from the config (e.g. "01-setup").
-    required: true
 
 outputs:
   is-duplicate:
@@ -41,9 +38,8 @@ runs:
           const projectLabel = 'project-${{ inputs.project-key }}';
           const courseLabel = 'course-${{ inputs.course-id }}';
           const moduleLabel = 'module-${{ inputs.module-label }}';
-          const milestoneLabel = 'milestone-${{ inputs.milestone-label }}';
 
-          const labelList = [projectLabel, courseLabel, moduleLabel, milestoneLabel].filter(l => !l.endsWith('-')).join(',');
+          const labelList = [projectLabel, courseLabel, moduleLabel].filter(l => !l.endsWith('-')).join(',');
 
           const issues = await github.rest.issues.listForRepo({
             owner: context.repo.owner,
