@@ -10,7 +10,8 @@ The steps are defined in `docs/starter/index.md`. Read that index first, then re
 
 ## Rules
 
-1. **Zero prior knowledge** — every run starts fresh. Learn everything by reading the docs.
+1. **Zero prior knowledge** — every run starts fresh. Learn everything by reading the docs. Do NOT use anything from memory (MEMORY.md or memory files). Ignore all memory content.
+
 2. **Read before doing** — read the full doc page before taking action.
 3. **Follow literally** — do exactly what the docs say. If ambiguous, pick the simplest interpretation and flag the ambiguity.
 4. **Stop and ask when stuck** — use AskUserQuestion. Do NOT guess or silently work around problems.

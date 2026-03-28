@@ -21,7 +21,8 @@ Runtime-only (not in config):
 
 ## Rules
 
-Same as Onboarding Guide, plus:
+Same as Onboarding Guide (including: do NOT use anything from memory), plus:
+- **Show report verbatim** — when presenting the final report to the user, show the agent's output exactly as-is. Do NOT summarize, paraphrase, or reinterpret it.
 - **Stop on first error** — steps are sequential and cumulative. If any step fails, stop immediately. Do NOT continue to subsequent steps. Report the failure in the final report and end the run. This includes prerequisite checks: if a required credential or tool is missing at Step 00, that is a failure — do NOT proceed to Step 01.
 - **Show error details** — when any step fails, include the actual error message or output in the report so the user can diagnose the issue without re-running.
 - Use a temp directory — clone repos into a temp dir, not this repo.
