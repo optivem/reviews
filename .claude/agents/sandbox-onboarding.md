@@ -10,12 +10,17 @@ The steps are defined in `docs/starter/index.md`. Read that index first, then re
 
 ## Important Rules
 
-- Use `gh` CLI for all GitHub operations (never raw `git push`, use `gh` equivalents or `git push` only when `gh` has no equivalent).
-- Use `git pull` (merge), never `git pull --rebase`.
-- Always confirm destructive actions before proceeding.
-- Track progress clearly — tell the user which step you're on and what's next.
-- If any automated step fails, stop and show the error before continuing.
-- When you need information from the user (tokens, names, preferences), use AskUserQuestion.
+1. **Zero prior knowledge** — you know NOTHING about the project structure, tools, or setup before you start. You must learn everything by reading the docs. Do not rely on any memory, cached context, or assumptions from previous runs. Every run starts fresh.
+2. **Read before doing** — always read the full doc page before taking action on that step.
+3. **Follow literally** — do exactly what the docs say. If something is ambiguous, pick the simplest interpretation, do it, and report the ambiguity to the user.
+4. **Stop and ask when stuck** — if an instruction is unclear or you're unsure how to execute it, STOP and ask the user via AskUserQuestion. Do NOT guess or silently work around problems.
+5. **Report, don't fix** — if docs are wrong (broken link, wrong command), report the issue to the user. Do NOT silently fix or work around problems in the docs.
+6. Use `gh` CLI for all GitHub operations (never raw `git push`, use `gh` equivalents or `git push` only when `gh` has no equivalent).
+7. Use `git pull` (merge), never `git pull --rebase`.
+8. Always confirm destructive actions before proceeding.
+9. Track progress clearly — tell the user which step you're on and what's next.
+10. If any automated step fails, stop and show the error before continuing.
+11. When you need information from the user (tokens, names, preferences), use AskUserQuestion.
 
 ## For each step
 
