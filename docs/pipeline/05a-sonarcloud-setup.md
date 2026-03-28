@@ -53,12 +53,19 @@ curl -s -u "${SONAR_TOKEN}:" \
   "https://sonarcloud.io/api/projects/search?organization=${SONAR_ORG}" | jq '.components[].key'
 ```
 
-SonarCloud defaults to `master` as the main branch. If your repository uses `main`, rename it:
+**Important:** SonarCloud defaults to `master` as the main branch. If your repository uses `main` (which is standard), you **must** rename it — otherwise SonarCloud will show "not analyzed" on the project overview even though analysis runs successfully on the `main` branch:
 
 ```bash
 curl -s -u "${SONAR_TOKEN}:" \
   -X POST "https://sonarcloud.io/api/project_branches/rename" \
   -d "project=${SONAR_PROJECT}&name=main"
+```
+
+Verify the rename took effect:
+
+```bash
+curl -s -u "${SONAR_TOKEN}:" \
+  "https://sonarcloud.io/api/project_branches/list?project=${SONAR_PROJECT}" | jq '.branches[] | {name, isMain}'
 ```
 
 ## 4. Add GitHub Secret (CLI)
@@ -113,6 +120,33 @@ curl -s -u "${SONAR_TOKEN}:" \
 
 You should see metrics for: bugs, vulnerabilities, code smells, coverage, and duplicated lines.
 
+## Bulk Operations
+
+To rename the default branch from `master` to `main` across all SonarCloud projects in your organization:
+
+```bash
+SONAR_ORG="<your-github-org>"
+
+for PROJECT in $(curl -s -u "${SONAR_TOKEN}:" \
+  "https://sonarcloud.io/api/projects/search?organization=${SONAR_ORG}" | jq -r '.components[].key'); do
+  echo "Renaming default branch for ${PROJECT}..."
+  curl -s -u "${SONAR_TOKEN}:" \
+    -X POST "https://sonarcloud.io/api/project_branches/rename" \
+    -d "project=${PROJECT}&name=main"
+done
+```
+
+To verify the branch configuration for all projects:
+
+```bash
+for PROJECT in $(curl -s -u "${SONAR_TOKEN}:" \
+  "https://sonarcloud.io/api/projects/search?organization=${SONAR_ORG}" | jq -r '.components[].key'); do
+  echo "=== ${PROJECT} ==="
+  curl -s -u "${SONAR_TOKEN}:" \
+    "https://sonarcloud.io/api/project_branches/list?project=${PROJECT}" | jq '.branches[] | {name, isMain}'
+done
+```
+
 ## Troubleshooting
 
 Check project exists:
@@ -130,6 +164,7 @@ curl -s -u "${SONAR_TOKEN}:" \
 ```
 
 Common issues:
+- **"Not analyzed" or "master branch has not been analyzed yet"** — SonarCloud's default branch is `master`, but your repo uses `main`. Rename it via the API (see Step 3 above) or in the SonarCloud UI: go to **Administration > Branches & Pull Requests**, click the `master` branch settings, and rename it to `main`.
 - **"Not authorized"** — Verify `SONAR_TOKEN` is correct (`gh secret list` to check it exists).
 - **"Project not found"** — Verify the project key and organization match between your build config and SonarCloud.
 - **No coverage data** — Ensure tests run and produce coverage reports before the sonar step.
