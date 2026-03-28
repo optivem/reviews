@@ -57,8 +57,24 @@ curl -s -u "${SONAR_TOKEN}:" \
 
 The `SONAR_TOKEN` is the same for all repos in your organization — it is your personal token, not per-project.
 
+**Option A — Per-repository secret:**
+
 ```bash
 gh secret set SONAR_TOKEN --body "${SONAR_TOKEN}"
+```
+
+**Option B — Organization secret (recommended if you have multiple repos):**
+
+If you set `SONAR_TOKEN` as an organization-level secret, it applies to all repos automatically — no need to repeat this step per repo.
+
+```bash
+gh secret set SONAR_TOKEN --org "${SONAR_ORG}" --visibility all --body "${SONAR_TOKEN}"
+```
+
+To restrict it to specific repos instead of all:
+
+```bash
+gh secret set SONAR_TOKEN --org "${SONAR_ORG}" --visibility selected --repos "repo1,repo2" --body "${SONAR_TOKEN}"
 ```
 
 Verify:
