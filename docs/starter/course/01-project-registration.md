@@ -1,4 +1,4 @@
-# Project Submission
+# Project Registration
 
 ## 1. Define Project Member(s)
 
