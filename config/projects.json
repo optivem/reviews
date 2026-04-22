@@ -1,15 +1,5 @@
 [
   {
-    "key": "ESHP",
-    "name": "Shop",
-    "repo": "https://github.com/optivem/shop",
-    "lead": "valentinajemuovic",
-    "members": [
-      "valentinajemuovic",
-      "jcupac"
-    ]
-  },
-  {
     "key": "CCRS",
     "name": "Car Charging Reservation System",
     "repo": "https://github.com/longhibeck/car-charging-reservation-system",
