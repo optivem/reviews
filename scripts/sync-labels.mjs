@@ -125,22 +125,46 @@ if (!APPLY) {
   process.exit(0);
 }
 
-// Execute
+// Execute — throttle to avoid GitHub secondary rate limits (~80-100 writes/min).
+// 750ms between mutations -> max ~80/min sustained.
+const THROTTLE_MS = 750;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function ghWrite(cmd, label) {
+  try {
+    execSync(cmd, { stdio: "inherit" });
+  } catch (err) {
+    const msg = String(err.message || err);
+    // Retry once on secondary rate limit
+    if (msg.includes("secondary rate limit") || msg.includes("abuse")) {
+      console.log(`  rate limited, backing off 60s then retrying: ${label}`);
+      execSync("node -e \"setTimeout(()=>{},60000)\"");
+      execSync(cmd, { stdio: "inherit" });
+    } else {
+      throw err;
+    }
+  }
+}
+
+const total = toCreate.length + toUpdate.length + deleteSafe.length;
+let done = 0;
+
 for (const { name, color } of toCreate) {
-  console.log(`Creating: ${name}`);
-  execSync(`gh label create "${name}" --color "${color}" --force`, {
-    stdio: "inherit",
-  });
+  console.log(`[${++done}/${total}] Creating: ${name}`);
+  ghWrite(`gh label create "${name}" --color "${color}" --force`, name);
+  await sleep(THROTTLE_MS);
 }
 
 for (const { name, color } of toUpdate) {
-  console.log(`Updating: ${name}`);
-  execSync(`gh label edit "${name}" --color "${color}"`, { stdio: "inherit" });
+  console.log(`[${++done}/${total}] Updating: ${name}`);
+  ghWrite(`gh label edit "${name}" --color "${color}"`, name);
+  await sleep(THROTTLE_MS);
 }
 
 for (const name of deleteSafe) {
-  console.log(`Deleting: ${name}`);
-  execSync(`gh label delete "${name}" --yes`, { stdio: "inherit" });
+  console.log(`[${++done}/${total}] Deleting: ${name}`);
+  ghWrite(`gh label delete "${name}" --yes`, name);
+  await sleep(THROTTLE_MS);
 }
 
 console.log("\nDone.\n");
