@@ -1,18 +1,21 @@
 name: dashboard
 
 on:
-  workflow_run:
-    workflows:
-      - auto-on-created
-      - auto-on-closed
-      - auto-on-comment
-      - auto-on-edited
-      - auto-on-reopened
-    types: [completed]
+  # Disabled: bursts of issue events (e.g. rapid ticket creation) trigger a
+  # workflow_run storm, and with cancel-in-progress: true most deploys get
+  # cancelled mid-flight, leaving Pages stale. Scheduled refresh covers it.
+  # workflow_run:
+  #   workflows:
+  #     - auto-on-created
+  #     - auto-on-closed
+  #     - auto-on-comment
+  #     - auto-on-edited
+  #     - auto-on-reopened
+  #   types: [completed]
   push:
     branches: [main]
   schedule:
-    - cron: '*/15 * * * *'  # every 15 minutes
+    - cron: '*/5 * * * *'  # every 5 minutes
   workflow_dispatch:
 
 permissions:
