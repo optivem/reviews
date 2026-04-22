@@ -4,10 +4,6 @@ on:
   issues:
     types: [opened]
 
-concurrency:
-  group: process-issue
-  cancel-in-progress: false
-
 jobs:
   validate:
     runs-on: ubuntu-latest
