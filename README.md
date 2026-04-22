@@ -4,11 +4,11 @@
 
 [![dashboard](https://github.com/optivem/hub/actions/workflows/dashboard.yml/badge.svg)](https://github.com/optivem/hub/actions/workflows/dashboard.yml)
 
-Optivem Academy — project submissions, reviews, and discussions
+Optivem Academy — sandbox project submissions, reviews, and discussions
 
 [Submit a Review Request](https://github.com/optivem/hub/issues/new/choose)
 
-## How to submit your project for review
+## How to submit your sandbox project for review
 
 1. Click [**Submit a Review Request**](https://github.com/optivem/hub/issues/new/choose)
 2. Select your project
