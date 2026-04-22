@@ -1,0 +1,15 @@
+{
+  "closedReasons": [
+    "blocked",
+    "duplicate",
+    "invalid"
+  ],
+  "githubDefaults": [
+    "bug",
+    "duplicate",
+    "help wanted",
+    "invalid",
+    "question",
+    "wontfix"
+  ]
+}

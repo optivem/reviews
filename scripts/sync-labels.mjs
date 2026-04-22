@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-import { execSync } from "child_process";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import { loadConfig } from "./load-config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
+
+const args = new Set(process.argv.slice(2));
+const APPLY = args.has("--apply");
 
 const config = loadConfig(ROOT);
 
@@ -15,10 +18,13 @@ const COLORS = {
   course: "5319e7",    // purple
   project: "0075ca",   // blue
   module: "e4e669",    // yellow
-  closed: "d73a4a",   // red
+  closed: "d73a4a",    // red
 };
 
-// Build expected labels from config (order: project, course, module)
+// GitHub default labels — never delete, never recolor
+const PROTECTED = new Set(config.labels.githubDefaults);
+
+// Build expected labels from config
 const expected = new Map();
 
 for (const p of config.projects) {
@@ -36,33 +42,105 @@ for (const c of config.courses) {
   }
 }
 
-// Auto-close reason labels
-for (const reason of ["invalid", "duplicate", "blocked"]) {
+for (const reason of config.labels.closedReasons) {
   expected.set(`closed-${reason}`, COLORS.closed);
 }
 
-// Fetch existing labels
-const existing = new Set(
-  JSON.parse(
-    execSync("gh label list --limit 500 --json name", { encoding: "utf-8" })
-  ).map((l) => l.name)
-);
+// Fetch existing labels (with colors)
+const existing = new Map();
+for (const l of JSON.parse(
+  execSync("gh label list --limit 500 --json name,color", { encoding: "utf-8" })
+)) {
+  existing.set(l.name, l.color);
+}
 
-// Create missing labels
-let created = 0;
+// Compute diff
+const toCreate = [];
+const toUpdate = [];
+const toDelete = [];
+
 for (const [name, color] of expected) {
   if (!existing.has(name)) {
-    console.log(`Creating label: ${name}`);
-    execSync(
-      `gh label create "${name}" --color "${color}" --force`,
-      { encoding: "utf-8", stdio: "inherit" }
-    );
-    created++;
+    toCreate.push({ name, color });
+  } else if (existing.get(name).toLowerCase() !== color.toLowerCase()) {
+    toUpdate.push({ name, color, oldColor: existing.get(name) });
   }
 }
 
-if (created === 0) {
-  console.log("All labels are in sync.");
-} else {
-  console.log(`Created ${created} label(s).`);
+for (const [name] of existing) {
+  if (!expected.has(name) && !PROTECTED.has(name)) {
+    toDelete.push(name);
+  }
 }
+
+// Check issue usage on to-delete labels before deleting.
+// Single gh call — build label -> count map from all issues at once.
+const labelUsage = new Map();
+const allIssues = JSON.parse(
+  execSync("gh issue list --state all --limit 1000 --json labels", {
+    encoding: "utf-8",
+  })
+);
+for (const iss of allIssues) {
+  for (const l of iss.labels) {
+    labelUsage.set(l.name, (labelUsage.get(l.name) || 0) + 1);
+  }
+}
+const issueCount = (label) => labelUsage.get(label) || 0;
+
+// Print plan
+const mode = APPLY ? "APPLY" : "DRY-RUN";
+console.log(`\n=== sync-labels (${mode}) ===\n`);
+
+console.log(`Create (${toCreate.length}):`);
+for (const { name, color } of toCreate) {
+  console.log(`  + ${name} (#${color})`);
+}
+
+console.log(`\nUpdate color (${toUpdate.length}):`);
+for (const { name, color, oldColor } of toUpdate) {
+  console.log(`  ~ ${name}: #${oldColor} -> #${color}`);
+}
+
+console.log(`\nDelete (${toDelete.length}):`);
+const deleteSafe = [];
+const deleteBlocked = [];
+for (const name of toDelete) {
+  const n = issueCount(name);
+  if (n > 0) {
+    deleteBlocked.push({ name, count: n });
+    console.log(`  ! ${name} (SKIPPED — ${n} issue(s) attached)`);
+  } else {
+    deleteSafe.push(name);
+    console.log(`  - ${name}`);
+  }
+}
+
+console.log(
+  `\nSummary: +${toCreate.length} create, ~${toUpdate.length} update, -${deleteSafe.length} delete, ${deleteBlocked.length} blocked\n`
+);
+
+if (!APPLY) {
+  console.log("Dry-run only. Re-run with --apply to execute.\n");
+  process.exit(0);
+}
+
+// Execute
+for (const { name, color } of toCreate) {
+  console.log(`Creating: ${name}`);
+  execSync(`gh label create "${name}" --color "${color}" --force`, {
+    stdio: "inherit",
+  });
+}
+
+for (const { name, color } of toUpdate) {
+  console.log(`Updating: ${name}`);
+  execSync(`gh label edit "${name}" --color "${color}"`, { stdio: "inherit" });
+}
+
+for (const name of deleteSafe) {
+  console.log(`Deleting: ${name}`);
+  execSync(`gh label delete "${name}" --yes`, { stdio: "inherit" });
+}
+
+console.log("\nDone.\n");
