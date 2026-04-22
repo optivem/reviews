@@ -6,6 +6,7 @@ on:
       - auto-on-created
       - auto-on-closed
       - auto-on-comment
+      - auto-on-deleted
       - auto-on-edited
       - auto-on-reopened
     types: [completed]
