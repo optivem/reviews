@@ -20,12 +20,27 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: course
+    attributes:
+      label: Course
+      description: Select the course you are submitting for.
+      options:
+        - Pipeline Accelerator
+        - ATDD Accelerator
+    validations:
+      required: true
+  - type: dropdown
     id: module
     attributes:
       label: Module
       description: Select the module you are submitting for review.
       options:
         - 01 - Introduction
+        - 02 - Commit Stage
+        - 03 - Acceptance Stage
+        - 04 - QA Stage
+        - 05 - Production Stage
+        - 01 - Getting Started
         - 02 - Smoke Tests
         - 03 - E2E Tests
         - 04 - Architecture - Clients
@@ -35,10 +50,10 @@ body:
         - 08 - Architecture - Scenario DSL
         - 09 - Architecture - External Stubs
         - 10 - Acceptance Tests
-        - 11 - External System Contract Tests
+        - 11 - Contract Tests
         - 12 - ATDD - Acceptance Criteria
         - 13 - ATDD - Acceptance Tests
-        - 14 - ATDD - External System Contract Tests
+        - 14 - ATDD - Contract Tests
         - 15 - Structural Changes
     validations:
       required: true

@@ -3,7 +3,7 @@
 ## Context
 
 - **Current name**: `optivem/sandbox`. Misleading — "sandbox" in the Academy's domain means *student practice workspace*, but this repo is the instructor-side review coordination hub.
-- **Target name**: `optivem/reviews`. Matches industry standard (Udacity's "Project Reviews" terminology) and the Academy's plural-collection naming convention (`actions`, `courses`).
+- **Target name**: `optivem/reviews`. Matches industry standard (Udacity's "Project Reviews" terminology) and the Academy's plural-collection naming convention (`actions`, `courses`). Chosen over `optivem/sandbox-reviews` on the student-perspective lens: students will share review links in portfolios / with employers, and `optivem/reviews/<name>` reads as a professional artifact where `sandbox-reviews` subtly frames their work as practice.
 - **Broken state today**: the README and sync scripts already reference a nonexistent repo `optivem/atdd-bootcamp`. The rename is the opportunity to fix this drift in one pass.
 - **Pages URL after rename**: `https://optivem.github.io/reviews/`.
 
