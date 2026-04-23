@@ -71,8 +71,13 @@ runs:
 
           const isReviewer = data.reviewers.some(r => r.github.toLowerCase() === creator.toLowerCase());
 
-          // Find project in top-level projects list
-          const team = data.projects.find(t => t.name === selectedProject);
+          // Match against either the "KEY — Name" format (current templates) or
+          // bare name (legacy templates). Tolerates both en-dash " — " and hyphen " - ".
+          const projectKeyGuess = selectedProject.split(/\s[—-]\s/)[0].trim();
+          const team = data.projects.find(t =>
+            t.key.toLowerCase() === projectKeyGuess.toLowerCase() ||
+            t.name === selectedProject
+          );
           if (!team) {
             core.setOutput('is_valid', 'false');
             return;

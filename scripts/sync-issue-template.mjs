@@ -30,7 +30,10 @@ const ROOT = join(__dirname, "..");
 
 const config = loadConfig(ROOT);
 
-const projectOptions = config.projects.map(p => `        - ${p.name}`).join("\n");
+const projectOptions = [...config.projects]
+  .sort((a, b) => a.key.localeCompare(b.key))
+  .map(p => `        - ${p.key} — ${p.name}`)
+  .join("\n");
 
 function shortName(courseName) {
   return courseName.split(" ")[0];

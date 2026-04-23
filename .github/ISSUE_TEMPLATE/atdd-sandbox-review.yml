@@ -7,14 +7,14 @@ body:
       label: Project
       description: Select your project.
       options:
-        - Car Charging Reservation System
-        - Budget OK
-        - CTF
-        - Ghibli Encyclopedia
-        - Veg Finder
-        - Flight Reservation System (FRS)
-        - Event Sourcing Learning Application
-        - Project Powerhouse
+        - BDOK — Budget OK
+        - CCRS — Car Charging Reservation System
+        - CTF — CTF
+        - ESLA — Event Sourcing Learning Application
+        - FRS — Flight Reservation System (FRS)
+        - GHBL — Ghibli Encyclopedia
+        - PWRH — Project Powerhouse
+        - VGFN — Veg Finder
     validations:
       required: true
   - type: dropdown
