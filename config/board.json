@@ -2,13 +2,15 @@
   "title": "Optivem Hub",
   "board": {
     "id": "PVT_kwDOAMwK8c4BSMdA",
+    "number": 18,
     "url": "https://github.com/orgs/optivem/projects/18",
     "statusFieldId": "PVTSSF_lADOAMwK8c4BSMdAzg_zO2I",
-    "statusOptions": {
+    "statusOptionIds": {
       "IN_PROGRESS": "6b6a9601",
       "IN_REVIEW": "a2132c0f",
       "DONE": "d5e37461"
-    }
+    },
+    "courses": ["pipeline", "atdd"]
   },
   "statuses": [
     { "key": "OPEN",        "name": "Open" },

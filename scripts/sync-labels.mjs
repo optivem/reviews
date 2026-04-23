@@ -9,7 +9,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 const args = new Set(process.argv.slice(2));
-const APPLY = args.has("--apply");
+const ADD    = args.has("--add");    // allow creating missing labels
+const UPDATE = args.has("--update"); // allow changing colors on existing labels
+const DELETE = args.has("--delete"); // allow deleting orphaned labels
 
 const config = loadConfig(ROOT);
 
@@ -89,20 +91,21 @@ for (const iss of allIssues) {
 const issueCount = (label) => labelUsage.get(label) || 0;
 
 // Print plan
-const mode = APPLY ? "APPLY" : "DRY-RUN";
+const flags = [ADD && "ADD", UPDATE && "UPDATE", DELETE && "DELETE"].filter(Boolean);
+const mode = flags.length === 0 ? "DRY-RUN" : flags.join(" + ");
 console.log(`\n=== sync-labels (${mode}) ===\n`);
 
-console.log(`Create (${toCreate.length}):`);
+console.log(`Create (${toCreate.length})${ADD ? "" : " — skipped (pass --add to apply)"}:`);
 for (const { name, color } of toCreate) {
   console.log(`  + ${name} (#${color})`);
 }
 
-console.log(`\nUpdate color (${toUpdate.length}):`);
+console.log(`\nUpdate color (${toUpdate.length})${UPDATE ? "" : " — skipped (pass --update to apply)"}:`);
 for (const { name, color, oldColor } of toUpdate) {
   console.log(`  ~ ${name}: #${oldColor} -> #${color}`);
 }
 
-console.log(`\nDelete (${toDelete.length}):`);
+console.log(`\nDelete (${toDelete.length})${DELETE ? "" : " — skipped (pass --delete to apply)"}:`);
 const deleteSafe = [];
 const deleteBlocked = [];
 for (const name of toDelete) {
@@ -120,8 +123,8 @@ console.log(
   `\nSummary: +${toCreate.length} create, ~${toUpdate.length} update, -${deleteSafe.length} delete, ${deleteBlocked.length} blocked\n`
 );
 
-if (!APPLY) {
-  console.log("Dry-run only. Re-run with --apply to execute.\n");
+if (flags.length === 0) {
+  console.log("Dry-run only. Re-run with --add / --update / --delete to apply.\n");
   process.exit(0);
 }
 
@@ -146,25 +149,34 @@ function ghWrite(cmd, label) {
   }
 }
 
-const total = toCreate.length + toUpdate.length + deleteSafe.length;
+const totalToRun =
+  (ADD ? toCreate.length : 0) +
+  (UPDATE ? toUpdate.length : 0) +
+  (DELETE ? deleteSafe.length : 0);
 let done = 0;
 
-for (const { name, color } of toCreate) {
-  console.log(`[${++done}/${total}] Creating: ${name}`);
-  ghWrite(`gh label create "${name}" --color "${color}" --force`, name);
-  await sleep(THROTTLE_MS);
+if (ADD) {
+  for (const { name, color } of toCreate) {
+    console.log(`[${++done}/${totalToRun}] Creating: ${name}`);
+    ghWrite(`gh label create "${name}" --color "${color}" --force`, name);
+    await sleep(THROTTLE_MS);
+  }
 }
 
-for (const { name, color } of toUpdate) {
-  console.log(`[${++done}/${total}] Updating: ${name}`);
-  ghWrite(`gh label edit "${name}" --color "${color}"`, name);
-  await sleep(THROTTLE_MS);
+if (UPDATE) {
+  for (const { name, color } of toUpdate) {
+    console.log(`[${++done}/${totalToRun}] Updating: ${name}`);
+    ghWrite(`gh label edit "${name}" --color "${color}"`, name);
+    await sleep(THROTTLE_MS);
+  }
 }
 
-for (const name of deleteSafe) {
-  console.log(`[${++done}/${total}] Deleting: ${name}`);
-  ghWrite(`gh label delete "${name}" --yes`, name);
-  await sleep(THROTTLE_MS);
+if (DELETE) {
+  for (const name of deleteSafe) {
+    console.log(`[${++done}/${totalToRun}] Deleting: ${name}`);
+    ghWrite(`gh label delete "${name}" --yes`, name);
+    await sleep(THROTTLE_MS);
+  }
 }
 
 console.log("\nDone.\n");

@@ -69,11 +69,12 @@ function extractOnly() {
 const only = extractOnly();
 const selected = only ? STEPS.filter(s => only.has(s.key)) : STEPS;
 
-// Orchestrator always runs sync-labels in dry-run mode.
-// (To apply label changes, invoke sync-labels.mjs directly with --apply.)
-// Also strip so sub-scripts that read argv[2] as courses-root don't misread it.
-{
-  const idx = process.argv.indexOf("--apply");
+// Orchestrator always runs mutating syncs in dry-run mode.
+// (To apply schema changes, invoke sync-labels.mjs or sync-project.mjs directly
+// with --add / --update / --delete as appropriate.)
+// Strip these flags so sub-scripts that read argv[2] as courses-root don't misread them.
+for (const flag of ["--apply", "--add", "--update", "--delete"]) {
+  const idx = process.argv.indexOf(flag);
   if (idx !== -1) process.argv.splice(idx, 1);
 }
 

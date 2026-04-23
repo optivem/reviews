@@ -15,22 +15,10 @@ function loadConfig(rootDir) {
     .sort()
     .map(f => JSON.parse(readFileSync(join(coursesDir, f), "utf-8")));
 
-  const boardsDir = join(configDir, "boards");
-  let boards = [];
-  try {
-    boards = readdirSync(boardsDir)
-      .filter(f => f.endsWith(".json"))
-      .sort()
-      .map(f => JSON.parse(readFileSync(join(boardsDir, f), "utf-8")));
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
-  }
-
   return {
     title: board.title,
     reviewers,
     board: board.board,
-    boards,
     statuses: board.statuses,
     students,
     projects,

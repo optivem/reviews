@@ -1,28 +1,28 @@
 #!/usr/bin/env node
 
 /**
- * Sync custom-field schema on per-course GitHub Project boards.
+ * Sync custom-field schema on the hub GitHub Project board (config.board).
  *
- * For each board in config/boards/*.json, reconcile its fields:
+ * Reconciles these fields on the board:
  *   - Student Project — options from config.projects (key — name)
- *   - Module          — options from the course's modules (NN - Name)
+ *   - Module          — options from the modules of every course in board.courses
  *   - Status          — options from config.statuses (names only; option IDs
  *                       are project-specific and looked up at runtime)
+ *   - Course          — added only when the board covers more than one course
  *
  * This script only touches field *schema* (fields and their options). It does
  * NOT set field values on items — that lives in sync-project-items.mjs.
  *
  * Safety:
- *   - Dry-run by default; pass --apply to execute.
- *   - Never deletes an existing option (would orphan items).
- *   - Extras (options present on the board but not in config) are kept and
- *     surfaced as warnings — delete via the UI once you confirm nothing uses them.
+ *   - Dry-run by default; pass --add to create missing fields/options.
+ *   - This script never deletes. Extras (options on the board but not in
+ *     config) are surfaced as warnings — delete via the UI if needed.
+ *   - Renames are not supported: the diff cannot tell a rename from
+ *     "delete old + add new", so handle renames manually via the UI.
  *
  * Usage:
- *   node scripts/sync-project.mjs
- *   node scripts/sync-project.mjs --apply
- *   node scripts/sync-project.mjs --only pipeline          # single board (courseId)
- *   node scripts/sync-project.mjs --only pipeline --apply
+ *   node scripts/sync-project.mjs           # dry-run
+ *   node scripts/sync-project.mjs --add     # apply additions
  */
 
 import { execSync } from "node:child_process";
@@ -34,9 +34,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 const args = process.argv.slice(2);
-const APPLY = args.includes("--apply");
-const onlyIdx = args.indexOf("--only");
-const ONLY = onlyIdx !== -1 ? args[onlyIdx + 1] : null;
+const ADD = args.includes("--add");
 
 const THROTTLE_MS = 750;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -72,9 +70,15 @@ const STATUS_COLORS = {
   "Done":        "GREEN",
 };
 
-function expectedFieldsFor(courseId) {
-  const course = config.courses.find((c) => c.id === courseId);
-  if (!course) return null;
+function coursesForBoard(board) {
+  const ids = board.courses || (board.courseId ? [board.courseId] : []);
+  return ids.map((id) => config.courses.find((c) => c.id === id)).filter(Boolean);
+}
+
+function expectedFieldsFor(board) {
+  const courses = coursesForBoard(board);
+  if (courses.length === 0) return null;
+  const multiCourse = courses.length > 1;
 
   const studentProjectOptions = config.projects.map((p) => ({
     name: `${p.key} — ${p.name}`,
@@ -82,11 +86,16 @@ function expectedFieldsFor(courseId) {
     description: p.repo || "",
   }));
 
-  const moduleOptions = (course.modules || []).map((m) => ({
-    name: `${m.number} - ${m.name}`,
-    color: "YELLOW",
-    description: "",
-  }));
+  const moduleOptions = [];
+  for (const course of courses) {
+    for (const m of course.modules || []) {
+      moduleOptions.push({
+        name: `${m.number} - ${m.name}`,
+        color: "YELLOW",
+        description: multiCourse ? course.name : "",
+      });
+    }
+  }
 
   const statusOptions = (config.statuses || []).map((s) => ({
     name: s.name,
@@ -94,11 +103,21 @@ function expectedFieldsFor(courseId) {
     description: "",
   }));
 
-  return {
-    "Student Project": studentProjectOptions,
-    "Module": moduleOptions,
-    "Status": statusOptions,
-  };
+  // Field creation order determines display order in the GitHub Projects UI.
+  // Order: most general (Course) → most specific (Status).
+  const fields = {};
+  if (multiCourse) {
+    fields["Course"] = courses.map((c) => ({
+      name: c.id.toUpperCase(),
+      color: "PURPLE",
+      description: c.name,
+    }));
+  }
+  fields["Sandbox Project"] = studentProjectOptions;
+  fields["Module"] = moduleOptions;
+  fields["Status"] = statusOptions;
+
+  return fields;
 }
 
 // --- Reconcile one board --------------------------------------------------
@@ -127,7 +146,7 @@ async function fetchBoardFields(projectId) {
   );
   const nodes = data.node.fields.nodes;
   const byName = new Map();
-  for (const f of nodes) if (f && f.name) byName.set(f.name, f);
+  for (const f of nodes) if (f?.name) byName.set(f.name, f);
   return { title: data.node.title, byName };
 }
 
@@ -166,10 +185,63 @@ async function addOptionToField(projectId, fieldId, existingOptions, newOption) 
   );
 }
 
-async function reconcileBoard(courseId, board) {
-  const expected = expectedFieldsFor(courseId);
+function diffOptions(actualField, expectedOptions) {
+  const actualNames = new Set((actualField.options || []).map((o) => o.name));
+  const toAdd = expectedOptions.filter((o) => !actualNames.has(o.name));
+  const extra = (actualField.options || []).filter(
+    (o) => !expectedOptions.some((e) => e.name === o.name)
+  );
+  return { toAdd, extra };
+}
+
+async function createMissingField(board, fieldName, expectedOptions) {
+  console.log(`  + field: ${fieldName} (${expectedOptions.length} options)`);
+  for (const o of expectedOptions) console.log(`      ${o.name}`);
+  if (ADD) {
+    await createField(board.id, fieldName, expectedOptions);
+    await sleep(THROTTLE_MS);
+  }
+}
+
+async function addMissingOptions(board, fieldName, actualField, toAdd) {
+  console.log(`  ~ field: ${fieldName} — adding ${toAdd.length} option(s):`);
+  for (const o of toAdd) console.log(`      + ${o.name}`);
+  if (!ADD) return;
+  await addOptionToField(board.id, actualField.id, actualField.options, toAdd[0]);
+  await sleep(THROTTLE_MS);
+  // If multiple to add, do one-by-one so merge stays correct.
+  for (let i = 1; i < toAdd.length; i++) {
+    const current = await fetchBoardFields(board.id);
+    const currentField = current.byName.get(fieldName);
+    await addOptionToField(board.id, currentField.id, currentField.options, toAdd[i]);
+    await sleep(THROTTLE_MS);
+  }
+}
+
+function reportExtras(fieldName, extra) {
+  console.log(`  ! field: ${fieldName} — ${extra.length} extra option(s) kept (not in config):`);
+  for (const o of extra) console.log(`      ? ${o.name}`);
+}
+
+async function reconcileField(board, fieldName, expectedOptions, actualField) {
+  if (!actualField) {
+    await createMissingField(board, fieldName, expectedOptions);
+    return { created: 1, optionsAdded: 0, skipped: 0 };
+  }
+  const { toAdd, extra } = diffOptions(actualField, expectedOptions);
+  if (toAdd.length === 0 && extra.length === 0) {
+    console.log(`  ok:    ${fieldName} (${expectedOptions.length} options)`);
+    return { created: 0, optionsAdded: 0, skipped: 1 };
+  }
+  if (toAdd.length > 0) await addMissingOptions(board, fieldName, actualField, toAdd);
+  if (extra.length > 0) reportExtras(fieldName, extra);
+  return { created: 0, optionsAdded: toAdd.length, skipped: 0 };
+}
+
+async function reconcileBoard(board) {
+  const expected = expectedFieldsFor(board);
   if (!expected) {
-    console.log(`  SKIP: no course config for "${courseId}"`);
+    console.log(`  SKIP: no courses resolved for board ${board.url || board.id}`);
     return { created: 0, optionsAdded: 0, skipped: 0 };
   }
 
@@ -177,86 +249,31 @@ async function reconcileBoard(courseId, board) {
   console.log(`\n── ${actual.title} (${board.url}) ──`);
 
   let created = 0, optionsAdded = 0, skipped = 0;
-
   for (const [fieldName, expectedOptions] of Object.entries(expected)) {
-    const actualField = actual.byName.get(fieldName);
-
-    if (!actualField) {
-      console.log(`  + field: ${fieldName} (${expectedOptions.length} options)`);
-      for (const o of expectedOptions) console.log(`      ${o.name}`);
-      if (APPLY) {
-        await createField(board.id, fieldName, expectedOptions);
-        await sleep(THROTTLE_MS);
-      }
-      created++;
-      continue;
-    }
-
-    // Field exists — diff options
-    const actualOptionNames = new Set((actualField.options || []).map((o) => o.name));
-    const toAdd = expectedOptions.filter((o) => !actualOptionNames.has(o.name));
-    const extra = (actualField.options || []).filter(
-      (o) => !expectedOptions.some((e) => e.name === o.name)
-    );
-
-    if (toAdd.length === 0 && extra.length === 0) {
-      console.log(`  ok:    ${fieldName} (${expectedOptions.length} options)`);
-      skipped++;
-      continue;
-    }
-
-    if (toAdd.length > 0) {
-      console.log(`  ~ field: ${fieldName} — adding ${toAdd.length} option(s):`);
-      for (const o of toAdd) console.log(`      + ${o.name}`);
-      if (APPLY) {
-        await addOptionToField(board.id, actualField.id, actualField.options, toAdd[0]);
-        await sleep(THROTTLE_MS);
-        // If multiple to add, do one-by-one so merge stays correct.
-        for (let i = 1; i < toAdd.length; i++) {
-          const current = await fetchBoardFields(board.id);
-          const currentField = current.byName.get(fieldName);
-          await addOptionToField(board.id, currentField.id, currentField.options, toAdd[i]);
-          await sleep(THROTTLE_MS);
-        }
-      }
-      optionsAdded += toAdd.length;
-    }
-
-    if (extra.length > 0) {
-      console.log(`  ! field: ${fieldName} — ${extra.length} extra option(s) kept (not in config):`);
-      for (const o of extra) console.log(`      ? ${o.name}`);
-    }
+    const r = await reconcileField(board, fieldName, expectedOptions, actual.byName.get(fieldName));
+    created += r.created;
+    optionsAdded += r.optionsAdded;
+    skipped += r.skipped;
   }
-
   return { created, optionsAdded, skipped };
 }
 
 // --- Main -----------------------------------------------------------------
 
-const mode = APPLY ? "APPLY" : "DRY-RUN";
+const mode = ADD ? "ADD" : "DRY-RUN";
 console.log(`=== sync-project (${mode}) ===`);
 
-const boards = (config.boards || []).filter(
-  (b) => !ONLY || ONLY === b.courseId
-);
-
-if (boards.length === 0) {
-  console.log("No boards to sync. Check config/boards/*.json and --only.");
-  process.exit(0);
+if (!config.board?.id) {
+  console.log("No board configured in config/board.json (board.id is missing).");
+  process.exit(1);
 }
 
-let totalCreated = 0, totalAdded = 0, totalSkipped = 0;
-for (const board of boards) {
-  const r = await reconcileBoard(board.courseId, board);
-  totalCreated += r.created;
-  totalAdded += r.optionsAdded;
-  totalSkipped += r.skipped;
-}
+const { created, optionsAdded, skipped } = await reconcileBoard(config.board);
 
 console.log(
-  `\nSummary: +${totalCreated} field(s), +${totalAdded} option(s), ${totalSkipped} ok\n`
+  `\nSummary: +${created} field(s), +${optionsAdded} option(s), ${skipped} ok\n`
 );
 
-if (!APPLY) {
-  console.log("Dry-run only. Re-run with --apply to execute.\n");
+if (!ADD) {
+  console.log("Dry-run only. Re-run with --add to create missing fields/options.\n");
 }
