@@ -103,7 +103,8 @@ function projectHeaderHtml(proj, done, total) {
 function progressCellHtml(done, total) {
   if (done === 0) return `<td class="cell progress-cell progress-none"></td>`;
   const p = pct(done, total);
-  return `<td class="cell progress-cell progress-active">${done} / ${total} (${p}%)</td>`;
+  const cls = done >= total ? "progress-done" : "progress-partial";
+  return `<td class="cell progress-cell ${cls}">${done} / ${total} (${p}%)</td>`;
 }
 
 function statusCellHtml(entry, proj) {
@@ -268,6 +269,10 @@ function buildMatrix(issues, course) {
 function renderDesktopTable(course, scored, totalModules) {
   const modules = course.modules;
 
+  const courseTitleHtml = course.url
+    ? `<a href="${escapeHtml(course.url)}" target="_blank" rel="noopener">${escapeHtml(course.name)}</a>`
+    : escapeHtml(course.name);
+
   const headers = scored
     .map(({ proj, doneCount }) => projectHeaderHtml(proj, doneCount, totalModules))
     .join("\n            ");
@@ -306,7 +311,7 @@ function renderDesktopTable(course, scored, totalModules) {
       <table>
         <thead>
           <tr>
-            <th class="module-name course-title-cell">${escapeHtml(course.name)}</th>
+            <th class="module-name course-title-cell">${courseTitleHtml}</th>
             ${headers}
           </tr>
           <tr class="progress-row">
@@ -366,9 +371,13 @@ ${moduleItems}
     })
     .join("\n");
 
+  const courseTitleHtml = course.url
+    ? `<a href="${escapeHtml(course.url)}" target="_blank" rel="noopener">${escapeHtml(course.name)}</a>`
+    : escapeHtml(course.name);
+
   return `
   <div class="course-section-mobile" id="course-${escapeHtml(course.id)}-mobile">
-    <h2 class="course-title">${escapeHtml(course.name)}</h2>
+    <h2 class="course-title">${courseTitleHtml}</h2>
 ${cards}
   </div>`;
 }
