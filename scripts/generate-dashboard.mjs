@@ -103,8 +103,7 @@ function projectHeaderHtml(proj, done, total) {
 function progressCellHtml(done, total) {
   if (done === 0) return `<td class="cell progress-cell progress-none"></td>`;
   const p = pct(done, total);
-  const cls = done >= total ? "progress-done" : "progress-partial";
-  return `<td class="cell progress-cell ${cls}">${done} / ${total} (${p}%)</td>`;
+  return `<td class="cell progress-cell progress-active">${done} / ${total} (${p}%)</td>`;
 }
 
 function statusCellHtml(entry, proj) {

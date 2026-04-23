@@ -42,8 +42,7 @@
     .cell-in-progress { background: #fef9c3; } .cell-in-progress a { color: #92400e; }
     .cell-done { background: #dcfce7; } .cell-done a { color: #166534; }
     .progress-cell { min-width: 100px; font-weight: 600; font-size: 0.75rem; }
-    .progress-done { background: #dcfce7; color: #166534; }
-    .progress-partial { background: #fef9c3; color: #92400e; }
+    .progress-active { color: #166534; }
     .progress-none { color: #9ca3af; }
     .legend { margin-top: 16px; margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.8rem; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
