@@ -113,12 +113,20 @@ function statusCellHtml(entry, proj) {
   return `<td class="cell cell-${cls}"><a href="${entry.url}" target="_blank" rel="noopener" title="${escapeHtml(proj.key)}: ${status}">${text}</a></td>`;
 }
 
+const NEW_ISSUE_BODY_TEMPLATE = readFileSync(
+  join(__dirname, "new-issue-body.md"),
+  "utf-8",
+);
+
 function newIssueUrl(proj, course, moduleName) {
+  const body = NEW_ISSUE_BODY_TEMPLATE
+    .replaceAll("{{PROJECT_KEY}}", proj.key)
+    .replaceAll("{{PROJECT_NAME}}", proj.name)
+    .replaceAll("{{COURSE_NAME}}", course.name)
+    .replaceAll("{{MODULE_NAME}}", moduleName);
   const params = new URLSearchParams({
-    template: `${course.id}-sandbox-review.yml`,
-    project: `${proj.key} — ${proj.name}`,
-    course: course.name,
-    module: moduleName,
+    title: `${proj.key} — ${moduleName}`,
+    body,
   });
   return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?${params.toString()}`;
 }
