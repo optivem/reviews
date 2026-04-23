@@ -183,11 +183,19 @@ async function fetchAllIssues(owner, repo) {
             pageInfo { hasNextPage endCursor }
             nodes {
               number title url
-              labels(first: 20) { nodes { name } }
               projectItems(first: 10) {
                 nodes {
                   project { id }
-                  fieldValueByName(name: "Status") {
+                  course: fieldValueByName(name: "Course") {
+                    ... on ProjectV2ItemFieldSingleSelectValue { name }
+                  }
+                  sandboxProject: fieldValueByName(name: "Sandbox Project") {
+                    ... on ProjectV2ItemFieldSingleSelectValue { name }
+                  }
+                  module: fieldValueByName(name: "Module") {
+                    ... on ProjectV2ItemFieldSingleSelectValue { name }
+                  }
+                  status: fieldValueByName(name: "Status") {
                     ... on ProjectV2ItemFieldSingleSelectValue { name }
                   }
                 }
@@ -213,29 +221,31 @@ function buildMatrix(issues, course) {
   const matrix = {};
   for (const proj of config.projects) matrix[proj.key.toLowerCase()] = {};
 
-  for (const issue of issues) {
-    const labels = issue.labels.nodes.map((l) => l.name);
-    const courseLabel = labels.find((l) => l.startsWith("course-"));
-    const moduleLabel = labels.find((l) => /^module-\d+/.test(l));
-    const projectLabel = labels.find((l) => /^project-/.test(l));
+  const checkCourseField = (config.board.courses?.length || 0) > 1;
+  const courseFieldValue = course.id.toUpperCase();
 
-    if (courseLabel !== `course-${course.id}`) continue;
-    if (moduleLabel && !projectLabel) {
-      console.warn(`Warning: [${course.name}] Issue #${issue.number} has ${moduleLabel} but no project- label — skipping`);
+  for (const issue of issues) {
+    const projectItem = issue.projectItems.nodes.find((n) => n.project.id === boardId);
+    if (!projectItem) continue;
+
+    if (checkCourseField && projectItem.course?.name !== courseFieldValue) continue;
+
+    const sandboxProject = projectItem.sandboxProject?.name;
+    const moduleField = projectItem.module?.name;
+    if (!sandboxProject || !moduleField) {
+      console.warn(`Warning: [${course.name}] Issue #${issue.number} on board but missing Sandbox Project or Module field — skipping`);
       continue;
     }
-    if (!moduleLabel || !projectLabel) continue;
 
-    const moduleNum = moduleLabel.match(/^module-(\d+)/)[1];
-    const projKey = projectLabel.replace("project-", "");
+    const projKey = sandboxProject.split(" — ")[0].toLowerCase();
+    const moduleNum = moduleField.split(" - ")[0];
 
     if (!matrix[projKey]) {
-      console.warn(`Warning: [${course.name}] Issue #${issue.number} has label ${projectLabel} but no matching project — skipping`);
+      console.warn(`Warning: [${course.name}] Issue #${issue.number} has Sandbox Project "${sandboxProject}" but no matching project — skipping`);
       continue;
     }
 
-    const projectItem = issue.projectItems.nodes.find((n) => n.project.id === boardId);
-    const status = projectItem?.fieldValueByName?.name || "In Review";
+    const status = projectItem.status?.name || "In Review";
     matrix[projKey][moduleNum] = { status, url: issue.url };
   }
   return matrix;
