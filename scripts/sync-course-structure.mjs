@@ -2,12 +2,10 @@
 
 /**
  * Sync course structure: scan sandbox-project.md files in each module
- * and update config/courses/*.json with module and milestone metadata
- * (number, label, name). Does NOT touch URLs.
+ * and update config/courses/*.json with module metadata (number, label,
+ * name). Does NOT touch URLs.
  *
- * Milestones are extracted from "## Milestone N: Name" headings in
- * each module's sandbox-project.md file. Modules without a
- * sandbox-project.md are excluded from the config.
+ * Modules without a sandbox-project.md are excluded from the config.
  *
  * Usage: node scripts/sync-course-structure.mjs [courses-root]
  *   courses-root defaults to ../courses (relative to hub repo root)
@@ -34,30 +32,6 @@ function readModuleTitle(moduleDir) {
   return match ? match[1].trim() : null;
 }
 
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function parseMilestones(sandboxProjectPath) {
-  const content = readFileSync(sandboxProjectPath, "utf-8");
-  const regex = /^## Milestone (\d+):\s*(.+)$/gm;
-  const milestones = [];
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    const num = match[1].padStart(2, "0");
-    const name = match[2].trim();
-    milestones.push({
-      number: num,
-      label: `${num}-${slugify(name)}`,
-      name,
-    });
-  }
-  return milestones;
-}
-
 function scanModules(coursePath) {
   const dirs = readdirSync(coursePath)
     .filter(d => /^\d{2}-/.test(d) && !d.includes("DRAFT") && !d.includes("guide") && statSync(join(coursePath, d)).isDirectory())
@@ -68,23 +42,18 @@ function scanModules(coursePath) {
     const name = readModuleTitle(moduleDir);
     if (!name) return null;
 
-    // Find sandbox-project.md file
     const sandboxFile = readdirSync(moduleDir)
       .find(f => f.includes("sandbox-project") && f.endsWith(".md"));
     if (!sandboxFile) return null;
-
-    const milestones = parseMilestones(join(moduleDir, sandboxFile));
 
     return {
       number: dir.slice(0, 2),
       label: dir,
       name,
-      milestones,
     };
   }).filter(Boolean);
 }
 
-// Main
 const configDir = join(ROOT, "config", "courses");
 
 for (const { id: courseId, configFile, coursePath } of COURSES) {
@@ -102,31 +71,19 @@ for (const { id: courseId, configFile, coursePath } of COURSES) {
   const course = JSON.parse(readFileSync(configPath, "utf-8"));
   const scanned = scanModules(coursePath);
 
-  // Build lookup of existing data to preserve URLs
-  const existing = new Map();
+  const existingUrls = new Map();
   for (const m of course.modules || []) {
-    const milestones = new Map();
-    for (const t of m.milestones || []) {
-      milestones.set(t.number, t);
-    }
-    existing.set(m.number, { ...m, _milestones: milestones });
+    existingUrls.set(m.number, m.url || "");
   }
 
-  course.modules = scanned.map(m => {
-    const prev = existing.get(m.number) || {};
-    const mod = { number: m.number, label: m.label, name: m.name, url: prev.url || "" };
-
-    const prevMilestones = prev._milestones || new Map();
-    mod.milestones = m.milestones.map(t => {
-      const pt = prevMilestones.get(t.number) || {};
-      return { number: t.number, label: t.label, name: t.name, url: pt.url || "" };
-    });
-
-    return mod;
-  });
+  course.modules = scanned.map(m => ({
+    number: m.number,
+    label: m.label,
+    name: m.name,
+    url: existingUrls.get(m.number) || "",
+  }));
 
   writeFileSync(configPath, JSON.stringify(course, null, 2) + "\n");
 
-  const milestoneCount = course.modules.reduce((sum, m) => sum + m.milestones.length, 0);
-  console.log(`${courseId}: ${course.modules.length} modules, ${milestoneCount} milestones (checklist items)`);
+  console.log(`${courseId}: ${course.modules.length} modules`);
 }

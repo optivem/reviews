@@ -4,7 +4,7 @@
  * Sync all hub data derived from the courses repo.
  * Runs the local sync scripts in order:
  *
- *   1. sync-course-structure.mjs  → config/courses/*.json (modules + milestones)
+ *   1. sync-course-structure.mjs  → config/courses/*.json (modules)
  *   2. sync-checklists.mjs        → checklists/{courseId}/{NN}.md
  *   3. sync-issue-template.mjs    → .github/ISSUE_TEMPLATE/review-request.yml
  *   4. sync-student-urls.mjs      → config/courses/*.json (url fields, from courses/generated/student-urls.json)

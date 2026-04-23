@@ -7,167 +7,31 @@
       "number": "01",
       "label": "01-introduction",
       "name": "Introduction",
-      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800730-overview",
-      "milestones": [
-        {
-          "number": "01",
-          "label": "01-design-your-system",
-          "name": "Design Your System",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100627-setup"
-        },
-        {
-          "number": "02",
-          "label": "02-template-generation",
-          "name": "Template Generation",
-          "url": ""
-        },
-        {
-          "number": "03",
-          "label": "03-project-collaborators",
-          "name": "Project Collaborators",
-          "url": ""
-        },
-        {
-          "number": "04",
-          "label": "04-practice-fix-or-revert",
-          "name": "Practice Fix-or-Revert",
-          "url": ""
-        }
-      ]
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800730-overview"
     },
     {
       "number": "02",
       "label": "02-commit-stage",
       "name": "Commit Stage",
-      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800764-overview",
-      "milestones": [
-        {
-          "number": "01",
-          "label": "01-commit-stage-passes-on-current-code",
-          "name": "Commit Stage Passes on Current Code 🔖",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100650-commit-stage"
-        },
-        {
-          "number": "02",
-          "label": "02-commit-stage-runs-on-push",
-          "name": "Commit Stage Runs on Push 🔖",
-          "url": ""
-        },
-        {
-          "number": "03",
-          "label": "03-commit-stage-detects-failures",
-          "name": "Commit Stage Detects Failures 🔖",
-          "url": ""
-        },
-        {
-          "number": "04",
-          "label": "04-verify-dev-version-is-applied",
-          "name": "Verify Dev Version Is Applied 🔖",
-          "url": ""
-        },
-        {
-          "number": "05",
-          "label": "05-update-version-and-verify-rebuild",
-          "name": "Update VERSION and Verify Rebuild 🔖",
-          "url": ""
-        }
-      ]
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800764-overview"
     },
     {
       "number": "03",
       "label": "03-acceptance-stage",
       "name": "Acceptance Stage",
-      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800794-overview",
-      "milestones": [
-        {
-          "number": "01",
-          "label": "01-acceptance-stage-passes",
-          "name": "Acceptance Stage Passes 🔖",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100809-qa-stage"
-        },
-        {
-          "number": "02",
-          "label": "02-acceptance-stage-detects-failures",
-          "name": "Acceptance Stage Detects Failures 🔖",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100814-qa-signoff"
-        },
-        {
-          "number": "03",
-          "label": "03-smoke-tests",
-          "name": "Smoke Tests",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100844-multi-component-qa-stage"
-        },
-        {
-          "number": "04",
-          "label": "04-e2e-tests",
-          "name": "E2E Tests",
-          "url": ""
-        },
-        {
-          "number": "05",
-          "label": "05-system-versioning",
-          "name": "System Versioning 🔖",
-          "url": ""
-        }
-      ]
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800794-overview"
     },
     {
       "number": "04",
       "label": "04-qa-stage",
       "name": "QA Stage",
-      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800819-overview",
-      "milestones": [
-        {
-          "number": "01",
-          "label": "01-qa-stage-passes",
-          "name": "QA Stage Passes 🔖",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100858-production-stage"
-        },
-        {
-          "number": "02",
-          "label": "02-qa-stage-detects-failures",
-          "name": "QA Stage Detects Failures 🔖",
-          "url": ""
-        },
-        {
-          "number": "03",
-          "label": "03-qa-signoff",
-          "name": "QA Signoff 🔖",
-          "url": ""
-        }
-      ]
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800819-overview"
     },
     {
       "number": "05",
       "label": "05-production-stage",
       "name": "Production Stage",
-      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800834-overview",
-      "milestones": [
-        {
-          "number": "01",
-          "label": "01-production-stage-passes",
-          "name": "Production Stage Passes 🔖",
-          "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/70100917-acceptance-stage"
-        },
-        {
-          "number": "02",
-          "label": "02-qa-signoff-gate-enforces",
-          "name": "QA Signoff Gate Enforces 🔖",
-          "url": ""
-        },
-        {
-          "number": "03",
-          "label": "03-release-version-tag-applied",
-          "name": "Release Version Tag Applied 🔖",
-          "url": ""
-        },
-        {
-          "number": "04",
-          "label": "04-multi-component-production-deploys",
-          "name": "Multi-Component Production Deploys 🔖",
-          "url": ""
-        }
-      ]
+      "url": "https://optivem.thinkific.com/courses/take/pipeline/texts/73800834-overview"
     }
   ],
   "projectKeys": [

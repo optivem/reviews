@@ -27,17 +27,9 @@ const urlsJsonPath = resolve(
   join(ROOT, "..", "courses", "generated", "student-urls.json")
 );
 
-function normalizeForMatch(s) {
-  return s.toLowerCase().replaceAll(/[^a-z0-9]/g, "");
-}
-
 function matchChapterToModule(chapterTitle, moduleNumber) {
   const m = chapterTitle.match(/^(\d+)\.\s*/);
   return m ? Number.parseInt(m[1], 10) === Number.parseInt(moduleNumber, 10) : false;
-}
-
-function matchLessonToMilestone(lessonTitle, milestoneName) {
-  return normalizeForMatch(lessonTitle) === normalizeForMatch(milestoneName);
 }
 
 if (existsSync(urlsJsonPath)) {
@@ -58,35 +50,26 @@ if (existsSync(urlsJsonPath)) {
     }
 
     let matchedModules = 0;
-    let matchedMilestones = 0;
-    let unmatchedMilestones = 0;
+    let unmatchedModules = 0;
 
     for (const module of course.modules) {
       const chapter = chapters.find(ch => matchChapterToModule(ch.title, module.number));
       if (!chapter) {
         console.log(`  ${course.courseSlug}: no chapter match for module ${module.number} - ${module.name}`);
+        unmatchedModules++;
         continue;
       }
-      matchedModules++;
 
       if (chapter.lessons.length > 0) {
         module.url = `${THINKIFIC_BASE}${chapter.lessons[0].path}`;
-      }
-
-      const milestoneLessons = chapter.lessons.slice(1);
-      for (const milestone of module.milestones) {
-        const lesson = milestoneLessons.find(l => matchLessonToMilestone(l.title, milestone.name));
-        if (lesson) {
-          milestone.url = `${THINKIFIC_BASE}${lesson.path}`;
-          matchedMilestones++;
-        } else {
-          unmatchedMilestones++;
-        }
+        matchedModules++;
+      } else {
+        unmatchedModules++;
       }
     }
 
     writeFileSync(join(coursesConfigDir, filename), JSON.stringify(course, null, 2) + "\n", "utf-8");
-    console.log(`  ${course.courseSlug}: ${matchedModules} modules, ${matchedMilestones} milestones matched, ${unmatchedMilestones} unmatched → ${filename}`);
+    console.log(`  ${course.courseSlug}: ${matchedModules} modules matched, ${unmatchedModules} unmatched → ${filename}`);
   }
 } else {
   console.log(`Skipping: ${urlsJsonPath} not found. Run scrape-student-urls in the courses repo first.`);

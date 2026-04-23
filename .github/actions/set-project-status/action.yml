@@ -26,13 +26,13 @@ runs:
         script: |
           const { loadConfig } = require('./scripts/load-config.cjs');
           const config = loadConfig('.');
-          const { id: projectId, statusFieldId } = config.board;
+          const { id: projectId, statusFieldId, statusOptions } = config.board;
 
           const validNames = config.statuses.map(s => s.name);
           const status = config.statuses.find(s => s.name === process.env.TARGET_STATUS);
-          const optionId = status?.optionId;
+          const optionId = statusOptions?.[status?.key];
           if (!optionId) {
-            core.setFailed(`Unknown status: "${process.env.TARGET_STATUS}". Valid values: ${validNames.join(', ')}`);
+            core.setFailed(`Unknown or unmapped status: "${process.env.TARGET_STATUS}". Valid values: ${validNames.join(', ')}`);
             return;
           }
 

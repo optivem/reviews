@@ -7,7 +7,7 @@ cd "$(git rev-parse --show-toplevel)" && node scripts/sync.mjs
 ```
 
 This runs:
-1. `sync-course-structure.mjs` → `config/courses/*.json` (modules + milestones) — step key: `structure`
+1. `sync-course-structure.mjs` → `config/courses/*.json` (modules) — step key: `structure`
 2. `sync-checklists.mjs` → `checklists/{courseId}/{NN}.md` — step key: `checklists`
 3. `sync-issue-template.mjs` → `.github/ISSUE_TEMPLATE/review-request.yml` — step key: `issue-template`
 4. `sync-student-urls.mjs` → `config/courses/*.json` url fields (from `courses/generated/student-urls.json`, if present) — step key: `urls`
@@ -31,13 +31,13 @@ That writes `courses/generated/student-urls.json`, which `/sync-hub` then reads.
 
 After the sync:
 
-1. Read `hub/config/courses/*.json` and flag any milestones with empty `url` fields.
+1. Read `hub/config/courses/*.json` and flag any modules with empty `url` fields.
 2. Report a summary:
-   - Modules and milestones synced per course
+   - Modules synced per course
    - Checklist files generated per course
    - Issue template: projects / courses / modules counts
-   - Student URLs: modules/milestones matched per course (or "skipped" if scrape JSON missing)
-   - Unmatched milestones (empty URL fields)
+   - Student URLs: modules matched per course (or "skipped" if scrape JSON missing)
+   - Unmatched modules (empty URL fields)
 3. Ring the terminal bell when done:
    ```
    powershell -command "[console]::beep(300, 150); Start-Sleep -Milliseconds 80; [console]::beep(380, 150); Start-Sleep -Milliseconds 80; [console]::beep(460, 150); Start-Sleep -Milliseconds 80; [console]::beep(520, 400)"

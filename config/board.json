@@ -3,23 +3,17 @@
   "board": {
     "id": "PVT_kwDOAMwK8c4BSMdA",
     "url": "https://github.com/orgs/optivem/projects/18",
-    "statusFieldId": "PVTSSF_lADOAMwK8c4BSMdAzg_zO2I"
+    "statusFieldId": "PVTSSF_lADOAMwK8c4BSMdAzg_zO2I",
+    "statusOptions": {
+      "IN_PROGRESS": "6b6a9601",
+      "IN_REVIEW": "a2132c0f",
+      "DONE": "d5e37461"
+    }
   },
   "statuses": [
-    {
-      "key": "IN_REVIEW",
-      "name": "In Review",
-      "optionId": "a2132c0f"
-    },
-    {
-      "key": "IN_PROGRESS",
-      "name": "In Progress",
-      "optionId": "6b6a9601"
-    },
-    {
-      "key": "DONE",
-      "name": "Done",
-      "optionId": "d5e37461"
-    }
+    { "key": "OPEN",        "name": "Open" },
+    { "key": "IN_PROGRESS", "name": "In Progress" },
+    { "key": "IN_REVIEW",   "name": "In Review" },
+    { "key": "DONE",        "name": "Done" }
   ]
 }
