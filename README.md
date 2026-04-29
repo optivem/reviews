@@ -66,16 +66,35 @@ When you've addressed feedback, add a comment on your issue describing what you 
 
 ## Notifications
 
-GitHub does not notify you about new discussions, issues, or comments by default. To make sure you receive notifications from this repo:
+GitHub does not notify you about new discussions, issues, or comments by default. Setting this up correctly requires **two** independent steps — watching the repo is not enough on its own.
+
+### Step 1 — Watch the repo
 
 1. Go to the [hub repository](https://github.com/optivem/hub)
 2. Click **Watch** (top right)
-3. Choose **Custom** → check **Discussions**, **Issues**, and any other categories you want
+3. Choose **All Activity**, or **Custom** → check **Discussions**, **Issues**, and any other categories you want
 
-Alternatively, choose **All Activity** to be notified about everything.
+### Step 2 — Enable delivery for each category in your global settings
+
+Even with **All Activity** watching, GitHub still suppresses notifications for any category whose delivery is turned off globally. **Discussions in particular is off by default.**
+
+1. Go to [github.com/settings/notifications](https://github.com/settings/notifications)
+2. Scroll to the **Discussions** section and enable **email** and/or **web** delivery
+3. Do the same for **Issues**, **Pull requests**, etc. as needed
+4. If you route org notifications to a specific email, confirm `optivem` is routed to an inbox you actually read (under **Custom routing**)
+
+### Automatic notifications
 
 You will also be notified automatically when:
 - Someone @mentions you in a discussion, issue, or comment
-- You comment on or subscribe to a specific discussion or issue
+- You comment on or subscribe to a specific discussion or issue (use the **Notifications** button at the bottom of any discussion/issue to subscribe to just that thread)
 
-You can review and manage your subscriptions at [github.com/notifications/subscriptions](https://github.com/notifications/subscriptions), and confirm email delivery at [github.com/settings/notifications](https://github.com/settings/notifications).
+### Troubleshooting "I'm watching but didn't get notified"
+
+If you watched **All Activity** but still missed something:
+
+- **Most common cause:** Discussions delivery is disabled in your global settings (Step 2 above).
+- Confirm you're not on **Custom** watching with Discussions unchecked — re-open the **Watch** dropdown to verify.
+- Check spam/junk for emails from `notifications@github.com`.
+- Make sure the `optivem` org isn't muted at [github.com/settings/notifications](https://github.com/settings/notifications) under "Notifications for…".
+- Review your active subscriptions at [github.com/notifications/subscriptions](https://github.com/notifications/subscriptions).
