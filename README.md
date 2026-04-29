@@ -69,3 +69,19 @@ When you've addressed feedback, add a comment on your issue describing what you 
 ## Refresh
 
 [Refresh Dashboard](https://github.com/optivem/hub/actions/workflows/dashboard.yml)
+
+## Notifications
+
+GitHub does not notify you about new discussions, issues, or comments by default. To make sure you receive notifications from this repo:
+
+1. Go to the [hub repository](https://github.com/optivem/hub)
+2. Click **Watch** (top right)
+3. Choose **Custom** → check **Discussions**, **Issues**, and any other categories you want
+
+Alternatively, choose **All Activity** to be notified about everything.
+
+You will also be notified automatically when:
+- Someone @mentions you in a discussion, issue, or comment
+- You comment on or subscribe to a specific discussion or issue
+
+You can review and manage your subscriptions at [github.com/notifications/subscriptions](https://github.com/notifications/subscriptions), and confirm email delivery at [github.com/settings/notifications](https://github.com/settings/notifications).
