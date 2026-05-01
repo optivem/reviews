@@ -95,7 +95,8 @@ function projectHeaderHtml(proj, done, total) {
   const nameHtml = proj.repo
     ? `<a href="${escapeHtml(proj.repo)}" target="_blank" rel="noopener" title="${escapeHtml(proj.name)}">${escapeHtml(proj.key)}</a>`
     : `<span title="${escapeHtml(proj.name)}">${escapeHtml(proj.key)}</span>`;
-  return `<th class="project-header" title="${escapeHtml(proj.name)} \u2014 ${done} / ${total} modules completed (${p}%)">${nameHtml}<div class="project-full-name">${escapeHtml(proj.name)}</div><div class="project-lead">${escapeHtml(displayName(proj.lead))}</div></th>`;
+  const leadHtml = `<a href="https://github.com/${encodeURIComponent(proj.lead)}" target="_blank" rel="noopener">${escapeHtml(displayName(proj.lead))}</a>`;
+  return `<th class="project-header" title="${escapeHtml(proj.name)} \u2014 ${done} / ${total} modules completed (${p}%)">${nameHtml}<div class="project-full-name">${escapeHtml(proj.name)}</div><div class="project-lead">${leadHtml}</div></th>`;
 }
 
 function progressCellHtml(done, total) {
