@@ -7,6 +7,12 @@
     .nav-tab { display: inline-block; padding: 6px 14px; font-size: 0.85rem; font-weight: 500; border-radius: 6px; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff; cursor: pointer; font-family: inherit; }
     .nav-tab:hover { background: #f3f4f6; }
     .nav-tab.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; cursor: default; }
+    .announcements-banner { margin-bottom: 20px; padding: 12px 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 0.85rem; color: #1e40af; line-height: 1.5; }
+    .announcements-banner-title { font-weight: 600; margin-bottom: 6px; }
+    .announcements-banner-list { list-style: none; padding-left: 0; }
+    .announcements-banner-list li { padding: 2px 0; }
+    .announcements-banner-list a { color: #1e40af; text-decoration: underline; font-weight: 500; }
+    .announcements-banner-list a:hover { color: #1e3a8a; }
     .summary-section { margin-bottom: 32px; }
     .summary-label { text-align: left; font-weight: 600; background: #f9fafb; white-space: nowrap; width: 320px; min-width: 320px; max-width: 320px; }
     .summary-label a { color: #1d4ed8; text-decoration: none; }

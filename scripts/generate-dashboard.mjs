@@ -183,6 +183,22 @@ async function graphql(query, variables = {}) {
   return json.data;
 }
 
+async function fetchPinnedDiscussions(owner, repo) {
+  const data = await graphql(
+    `query($owner: String!, $repo: String!) {
+      repository(owner: $owner, name: $repo) {
+        pinnedDiscussions(first: 10) {
+          nodes {
+            discussion { title url }
+          }
+        }
+      }
+    }`,
+    { owner, repo }
+  );
+  return data.repository.pinnedDiscussions.nodes.map((n) => n.discussion);
+}
+
 async function fetchAllIssues(owner, repo) {
   const issues = [];
   let cursor = null;
@@ -392,6 +408,22 @@ function generateCourseSection(course, matrix, sortedProjects) {
   };
 }
 
+// ── Pinned announcements banner ──
+
+function renderPinnedBanner(pinned) {
+  if (!pinned || pinned.length === 0) return "";
+  const items = pinned
+    .map((d) => `      <li><a href="${escapeHtml(d.url)}" target="_blank" rel="noopener">${escapeHtml(d.title)}</a></li>`)
+    .join("\n");
+  return `
+  <aside class="announcements-banner">
+    <div class="announcements-banner-title">Announcements</div>
+    <ul class="announcements-banner-list">
+${items}
+    </ul>
+  </aside>`;
+}
+
 // ── Summary table ──
 
 function generateSummaryTable(courses, matrices, sortedProjects) {
@@ -462,6 +494,10 @@ async function main() {
   const issues = await fetchAllIssues(GITHUB_OWNER, GITHUB_REPO);
   console.log(`Fetched ${issues.length} issues.`);
 
+  console.log("Fetching pinned discussions...");
+  const pinned = await fetchPinnedDiscussions(GITHUB_OWNER, GITHUB_REPO);
+  console.log(`Fetched ${pinned.length} pinned discussion(s).`);
+
   const matrices = courses.map((c) => {
     console.log(`Processing ${c.name}...`);
     return buildMatrix(issues, c);
@@ -484,6 +520,7 @@ async function main() {
     .replace("{{DASHBOARD_CSS}}", css)
     .replace("{{LAST_UPDATED}}", new Date().toUTCString())
     .replace("{{VERSION}}", version)
+    .replace("{{PINNED_BANNER}}", renderPinnedBanner(pinned))
     .replace("{{SUMMARY_TABLE}}", generateSummaryTable(courses, matrices, sortedProjects))
     .replace("{{COURSE_SECTIONS}}", sections.join("\n"))
     .replace("{{COURSE_CARDS}}", cards.join("\n"))

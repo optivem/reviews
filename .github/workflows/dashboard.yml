@@ -10,6 +10,8 @@ on:
       - auto-on-edited
       - auto-on-reopened
     types: [completed]
+  discussion:
+    types: [pinned, unpinned, edited, deleted]
   push:
     branches: [main]
   schedule:
